@@ -21,7 +21,9 @@ issues/PRs aren't actively triaged.
 | Plugin | Ships | Description |
 | --- | --- | --- |
 | `ai-protocols` | Skills | A2A, A2UI, AG-UI, and MCP protocol knowledge skills. |
-| `web-frontend` | Skills | Qwik, the View Transition API, and WXT. |
+| `qwik` | Skills | Qwik (v1/v2) and Qwik City / Qwik Router. |
+| `web-view-transition` | Skills | The View Transition API (SPA and cross-document). |
+| `wxt` | Skills | Building browser extensions with WXT. |
 | `prompt-engineering` | Skills | Eval-driven prompt refinement for the Claude API and Claude Code. |
 | `authoring` | Skills | Markdown linting/fixing and Mermaid diagrams. |
 | `dev-workflow` | Skills | Conventional Commits, development standards, and a KEDB. |
@@ -64,7 +66,9 @@ bundled into Claude Code plugins:
 | Plugin | Bundled skills |
 | --- | --- |
 | `ai-protocols` | `a2a-knowledge`, `a2ui-knowledge`, `ag-ui-knowledge`, `mcp-knowledge` |
-| `web-frontend` | `qwik`, `web-view-transition`, `wxt` |
+| `qwik` | `qwik` |
+| `web-view-transition` | `web-view-transition` |
+| `wxt` | `wxt` |
 | `prompt-engineering` | `prompt-evaluation`, `prompt-evaluation-claude-code` |
 | `authoring` | `markdown`, `mermaid` |
 | `dev-workflow` | `conventional-commits`, `development-standards`, `kedb` |
