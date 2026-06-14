@@ -24,7 +24,7 @@ issues/PRs aren't actively triaged.
 | `qwik` | Skills | Qwik (v1/v2) and Qwik City / Qwik Router. |
 | `web-view-transition` | Skills | The View Transition API (SPA and cross-document). |
 | `wxt` | Skills | Building browser extensions with WXT. |
-| `prompt-engineering` | Skills | Eval-driven prompt refinement for the Claude API and Claude Code. |
+| `prompt-evaluation-claude-code` | Skills | Eval-driven prompt refinement run inside Claude Code. |
 | `authoring` | Skills | Markdown linting/fixing and Mermaid diagrams. |
 | `conventional-commits` | Skills | Conventional Commits messages. |
 | `development-standards` | Skills | Org-internal engineering standards. |
@@ -62,7 +62,7 @@ a matter of placing their directories under `skills/`.
 ## Migration status
 
 This repo was migrated from the former `46ki75/skills` repository, where the
-15 skills were distributed as agentskills.io ZIP releases. Fourteen are now
+15 skills were distributed as agentskills.io ZIP releases. Thirteen are now
 published as Claude Code plugins:
 
 | Plugin | Bundled skills |
@@ -71,14 +71,19 @@ published as Claude Code plugins:
 | `qwik` | `qwik` |
 | `web-view-transition` | `web-view-transition` |
 | `wxt` | `wxt` |
-| `prompt-engineering` | `prompt-evaluation`, `prompt-evaluation-claude-code` |
+| `prompt-evaluation-claude-code` | `prompt-evaluation-claude-code` |
 | `authoring` | `markdown`, `mermaid` |
 | `conventional-commits` | `conventional-commits` |
 | `development-standards` | `development-standards` |
 | `rust` | `rust-toasty` |
 
-`kedb` is kept as a standalone skill under `skills/kedb/` — it maintains a
-local Known Error Database and is intentionally not published as a plugin.
+Two skills are kept standalone under `skills/`, intentionally not published as
+plugins:
+
+- `skills/kedb/` — maintains a local Known Error Database.
+- `skills/prompt-evaluation/` — eval-driven prompt refinement for the
+  Anthropic / Claude API (its Claude Code counterpart ships as the
+  `prompt-evaluation-claude-code` plugin).
 
 > **Note on the ZIP pipeline:** `skill-cli` (under `crates/`) scans the
 > top-level `skills/` directory one level deep. Skills now live under

@@ -60,15 +60,14 @@
       ]
     },
     {
-      "name": "prompt-engineering",
-      "source": "./plugins/prompt-engineering",
-      "description": "Eval-driven prompt refinement skills for the Anthropic / Claude API and for Claude Code.",
+      "name": "prompt-evaluation-claude-code",
+      "source": "./plugins/prompt-evaluation-claude-code",
+      "description": "Eval-driven prompt refinement that runs entirely inside Claude Code via the Agent/Task tooling.",
       "version": "1.0.0",
       "keywords": [
         "skill",
         "prompt-engineering",
         "evals",
-        "claude",
         "claude-code"
       ]
     },

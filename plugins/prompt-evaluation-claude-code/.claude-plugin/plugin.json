@@ -1,19 +1,18 @@
 {
-  "name": "prompt-engineering",
+  "name": "prompt-evaluation-claude-code",
   "version": "1.0.0",
-  "description": "Eval-driven prompt refinement skills for the Anthropic / Claude API and for Claude Code.",
+  "description": "Eval-driven prompt refinement that runs entirely inside Claude Code via the Agent/Task tooling.",
   "author": {
     "name": "Ikuma Yamashita",
     "email": "me@ikuma.cloud"
   },
-  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/prompt-engineering",
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/prompt-evaluation-claude-code",
   "repository": "https://github.com/46ki75/claude-plugins",
   "license": "MIT",
   "keywords": [
     "skill",
     "prompt-engineering",
     "evals",
-    "claude",
     "claude-code"
   ]
 }
