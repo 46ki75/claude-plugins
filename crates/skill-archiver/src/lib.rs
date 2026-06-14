@@ -9,6 +9,11 @@ use walkdir::{DirEntry, WalkDir};
 use zip::CompressionMethod;
 use zip::write::{FileOptions, ZipWriter};
 
+/// Prefix applied to every release tag and archive filename, namespacing skill
+/// releases (`agent-skills-<name>-v<version>`) apart from other releases in the
+/// repository.
+pub const TAG_PREFIX: &str = "agent-skills-";
+
 /// Errors produced by [`clean_dist`] and [`build_archive`].
 #[derive(Debug, thiserror::Error)]
 pub enum ArchiveError {
@@ -37,9 +42,9 @@ pub struct BuiltArtifact {
     pub name: String,
     /// Skill version from `metadata.version`.
     pub version: String,
-    /// GitHub release tag — always `"{name}-v{version}"`.
+    /// GitHub release tag — always `"agent-skills-{name}-v{version}"`.
     pub tag: String,
-    /// Bare filename of the archive (e.g. `markdown-v1.0.0.zip`).
+    /// Bare filename of the archive (e.g. `agent-skills-markdown-v1.0.0.zip`).
     pub file_name: String,
     /// Full path to the archive inside the dist directory.
     pub zip_path: PathBuf,
@@ -54,7 +59,7 @@ pub async fn clean_dist(dist: &Path) -> Result<(), ArchiveError> {
     Ok(())
 }
 
-/// Builds `dist/<name>-v<version>.zip` from the skill's directory tree.
+/// Builds `dist/agent-skills-<name>-v<version>.zip` from the skill's directory tree.
 ///
 /// Returns a [`BuiltArtifact`] describing the resulting file. Returns
 /// [`ArchiveError::MissingVersion`] if `metadata.version` is absent — callers
@@ -71,7 +76,7 @@ pub async fn build_archive(
         .ok_or_else(|| ArchiveError::MissingVersion(skill.dir_name.clone()))?;
 
     let name = skill.frontmatter.name.clone();
-    let tag = format!("{name}-v{version}");
+    let tag = format!("{TAG_PREFIX}{name}-v{version}");
     let file_name = format!("{tag}.zip");
     let zip_path = dist.join(&file_name);
 

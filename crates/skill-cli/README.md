@@ -9,7 +9,7 @@ CLI orchestrator that validates, archives, and publishes the skills under
 - `check` — parse and validate every skill. Exits non-zero on any failure
   without writing files.
 - `build` — validate every skill (collecting every error, not fail-fast); if
-  all skills pass, clean `dist/` and write `<name>-v<version>.zip` per skill
+  all skills pass, clean `dist/` and write `agent-skills-<name>-v<version>.zip` per skill
   in parallel. Exits non-zero on any validation failure and does *not* touch
   `dist/` in that case.
 - `upload` — runs `build`; aborts if any skill failed validation. Otherwise
