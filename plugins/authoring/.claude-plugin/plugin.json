@@ -1,0 +1,19 @@
+{
+  "name": "authoring",
+  "version": "1.0.0",
+  "description": "Document authoring skills: Markdown linting/fixing with markdownlint-cli2 and Mermaid diagram creation.",
+  "author": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/authoring",
+  "repository": "https://github.com/46ki75/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "skill",
+    "markdown",
+    "mermaid",
+    "documentation",
+    "diagrams"
+  ]
+}

@@ -1,0 +1,21 @@
+config:
+  MD013:
+    line_length: 200
+    tables: false
+    code_blocks: false
+  MD024:
+    siblings_only: true
+  MD029:
+    style: ordered
+ignores:
+  - "**/node_modules/**"
+  - "./.agents/**"
+  - "./.claude/**"
+  - "./notes/**"
+  - "./refs/**"
+  - "./skills/*-workspace/**"
+  - "./skills/rust-toasty/references/**"
+  - "./skills/a2a-knowledge/references/**"
+  - "./skills/development-standards/references/**"
+  - "./submodules/**"
+  - "./target/**"

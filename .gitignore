@@ -1,0 +1,15 @@
+notes/*
+
+!.gitkeep
+
+# Node.js
+node_modules/
+
+# Rust
+target/
+
+# Python
+__pycache__/
+
+# Build artifacts produced by skill_uploader
+dist/

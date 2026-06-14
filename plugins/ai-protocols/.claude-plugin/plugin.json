@@ -1,0 +1,21 @@
+{
+  "name": "ai-protocols",
+  "version": "1.0.0",
+  "description": "Expert knowledge skills for AI agent protocols: A2A (Agent2Agent), A2UI (Agent to UI), AG-UI (Agent–User Interaction), and MCP (Model Context Protocol).",
+  "author": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/ai-protocols",
+  "repository": "https://github.com/46ki75/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "skill",
+    "a2a",
+    "a2ui",
+    "ag-ui",
+    "mcp",
+    "model-context-protocol",
+    "agent-protocol"
+  ]
+}

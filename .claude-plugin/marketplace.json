@@ -1,0 +1,103 @@
+{
+  "name": "46ki75-plugins",
+  "owner": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "description": "Personal collection of Claude Code plugins: bundled Agent Skills and workflow hooks.",
+  "plugins": [
+    {
+      "name": "ai-protocols",
+      "source": "./plugins/ai-protocols",
+      "description": "Expert knowledge skills for AI agent protocols: A2A, A2UI, AG-UI, and MCP.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "a2a",
+        "a2ui",
+        "ag-ui",
+        "mcp",
+        "agent-protocol"
+      ]
+    },
+    {
+      "name": "web-frontend",
+      "source": "./plugins/web-frontend",
+      "description": "Frontend and browser-extension development skills: Qwik, the View Transition API, and WXT.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "qwik",
+        "web-view-transition",
+        "wxt",
+        "frontend",
+        "browser-extension"
+      ]
+    },
+    {
+      "name": "prompt-engineering",
+      "source": "./plugins/prompt-engineering",
+      "description": "Eval-driven prompt refinement skills for the Anthropic / Claude API and for Claude Code.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "prompt-engineering",
+        "evals",
+        "claude",
+        "claude-code"
+      ]
+    },
+    {
+      "name": "authoring",
+      "source": "./plugins/authoring",
+      "description": "Document authoring skills: Markdown linting/fixing and Mermaid diagram creation.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "markdown",
+        "mermaid",
+        "documentation",
+        "diagrams"
+      ]
+    },
+    {
+      "name": "dev-workflow",
+      "source": "./plugins/dev-workflow",
+      "description": "Engineering workflow skills: Conventional Commits, org development standards, and a Known Error Database (KEDB).",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "conventional-commits",
+        "development-standards",
+        "kedb",
+        "workflow"
+      ]
+    },
+    {
+      "name": "rust",
+      "source": "./plugins/rust",
+      "description": "Rust development skills. Currently bundles Toasty ORM (v0.7) guidance.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "rust",
+        "toasty",
+        "orm"
+      ]
+    },
+    {
+      "name": "wsl-notification",
+      "source": "./plugins/wsl-notification",
+      "description": "Sends Claude Code Notification and Stop events as Windows toast notifications from WSL2 via powershell.exe.",
+      "version": "0.2.0",
+      "keywords": [
+        "hook",
+        "notification",
+        "wsl",
+        "wsl2",
+        "windows",
+        "toast"
+      ]
+    }
+  ]
+}

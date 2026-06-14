@@ -1,0 +1,20 @@
+{
+  "name": "web-frontend",
+  "version": "1.0.0",
+  "description": "Frontend and browser-extension development skills: the Qwik framework, the View Transition API, and the WXT extension framework.",
+  "author": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/web-frontend",
+  "repository": "https://github.com/46ki75/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "skill",
+    "qwik",
+    "web-view-transition",
+    "wxt",
+    "frontend",
+    "browser-extension"
+  ]
+}
