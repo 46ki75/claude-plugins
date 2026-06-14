@@ -1,0 +1,18 @@
+{
+  "name": "development-standards",
+  "version": "1.0.0",
+  "description": "Org-internal engineering standards for this organization's projects.",
+  "author": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/development-standards",
+  "repository": "https://github.com/46ki75/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "skill",
+    "development-standards",
+    "conventions",
+    "workflow"
+  ]
+}

@@ -86,16 +86,41 @@
       ]
     },
     {
-      "name": "dev-workflow",
-      "source": "./plugins/dev-workflow",
-      "description": "Engineering workflow skills: Conventional Commits, org development standards, and a Known Error Database (KEDB).",
+      "name": "conventional-commits",
+      "source": "./plugins/conventional-commits",
+      "description": "Write, format, and review commit messages that follow the Conventional Commits specification.",
       "version": "1.0.0",
       "keywords": [
         "skill",
         "conventional-commits",
-        "development-standards",
-        "kedb",
+        "git",
+        "commit",
         "workflow"
+      ]
+    },
+    {
+      "name": "development-standards",
+      "source": "./plugins/development-standards",
+      "description": "Org-internal engineering standards for this organization's projects.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "development-standards",
+        "conventions",
+        "workflow"
+      ]
+    },
+    {
+      "name": "kedb",
+      "source": "./plugins/kedb",
+      "description": "Maintains a Known Error Database (KEDB) of documented errors, symptoms, workarounds, and root causes.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "kedb",
+        "known-error",
+        "troubleshooting",
+        "operations"
       ]
     },
     {

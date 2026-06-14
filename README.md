@@ -26,7 +26,9 @@ issues/PRs aren't actively triaged.
 | `wxt` | Skills | Building browser extensions with WXT. |
 | `prompt-engineering` | Skills | Eval-driven prompt refinement for the Claude API and Claude Code. |
 | `authoring` | Skills | Markdown linting/fixing and Mermaid diagrams. |
-| `dev-workflow` | Skills | Conventional Commits, development standards, and a KEDB. |
+| `conventional-commits` | Skills | Conventional Commits messages. |
+| `development-standards` | Skills | Org-internal engineering standards. |
+| `kedb` | Skills | Known Error Database maintenance. |
 | `rust` | Skills | Toasty ORM (v0.7) guidance. |
 | `wsl-notification` | Hooks | Windows toast notifications for Claude Code events from WSL2. |
 
@@ -71,7 +73,9 @@ bundled into Claude Code plugins:
 | `wxt` | `wxt` |
 | `prompt-engineering` | `prompt-evaluation`, `prompt-evaluation-claude-code` |
 | `authoring` | `markdown`, `mermaid` |
-| `dev-workflow` | `conventional-commits`, `development-standards`, `kedb` |
+| `conventional-commits` | `conventional-commits` |
+| `development-standards` | `development-standards` |
+| `kedb` | `kedb` |
 | `rust` | `rust-toasty` |
 
 The top-level `skills/` directory is now an empty staging area for new skills
