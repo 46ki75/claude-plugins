@@ -1,8 +1,12 @@
 # skill-cli
 
-CLI orchestrator that validates, archives, and publishes the skills under
-`skills/`. Built on top of `skill-parser`, `skill-validator`, and
+CLI orchestrator that validates, archives, and publishes Agent Skills from both
+channels — standalone skills under `skills/` and plugin-bundled skills under
+`plugins/*/skills/`. Built on top of `skill-parser`, `skill-validator`, and
 `skill-archiver`.
+
+Because a skill's `name` becomes its release tag, the scan errors out if two
+skills (across either channel) share the same `name`.
 
 ## Subcommands
 
@@ -22,7 +26,9 @@ CLI orchestrator that validates, archives, and publishes the skills under
 
 ## Flags
 
-- `--skills-dir <PATH>` — defaults to `./skills`.
+- `--skills-dir <PATH>` — standalone skills root, defaults to `./skills`.
+- `--plugins-dir <PATH>` — plugins root; scans `<PATH>/*/skills/*`, defaults to
+  `./plugins`. A missing root is treated as empty, not an error.
 - `--dist-dir <PATH>` — defaults to `./dist`.
 - `--repo <OWNER/NAME>` (`upload` only) — overrides `$GITHUB_REPOSITORY` and
   the `origin` remote.

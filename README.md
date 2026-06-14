@@ -85,17 +85,17 @@ plugins:
   Anthropic / Claude API (its Claude Code counterpart ships as the
   `prompt-evaluation-claude-code` plugin).
 
-> **Note on the ZIP pipeline:** `skill-cli` (under `crates/`) scans the
-> top-level `skills/` directory one level deep. Skills now live under
-> `plugins/<name>/skills/` and are no longer picked up by that pipeline. If the
-> agentskills.io ZIP channel should keep covering them, point the pipeline at
-> `plugins/*/skills/` (e.g. `skill-cli check --skills-dir` per plugin, or
-> teach `scan_and_validate` to glob `plugins/*/skills/*`).
+The `skill-cli` ZIP pipeline (under `crates/`) covers **both** channels: it
+scans standalone skills under `skills/*` and plugin-bundled skills under
+`plugins/*/skills/*`, so every skill is published as an
+`agent-skills-<name>-v<version>` release regardless of where it lives. Because a
+skill's `name` becomes its release tag, the scan errors out on any duplicate
+`name` across the two channels.
 
 ## Local commands
 
 ```bash
-# Validate skills still under skills/ (does not see plugins/*/skills yet)
+# Validate every skill (skills/* and plugins/*/skills/*)
 cargo run -p skill-cli -- check
 
 # Markdown lint

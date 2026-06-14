@@ -12,9 +12,14 @@ use crate::pipeline::{self, BuildOutcome};
     about = "Validate, archive, and publish Agent Skills"
 )]
 pub struct Cli {
-    /// Path to the skills directory (defaults to ./skills).
+    /// Path to the standalone skills directory (defaults to ./skills).
     #[arg(long, default_value = "skills")]
     pub skills_dir: PathBuf,
+
+    /// Path to the plugins directory; plugin-bundled skills under
+    /// `<plugins_dir>/*/skills/*` are scanned too (defaults to ./plugins).
+    #[arg(long, default_value = "plugins")]
+    pub plugins_dir: PathBuf,
 
     /// Path to the output directory for ZIP archives (defaults to ./dist).
     #[arg(long, default_value = "dist")]
@@ -44,7 +49,8 @@ pub enum Command {
 pub async fn run(args: Cli) -> anyhow::Result<ExitCode> {
     match args.command {
         Command::Check => {
-            let (_, had_errors) = pipeline::scan_and_validate(&args.skills_dir).await?;
+            let (_, had_errors) =
+                pipeline::scan_and_validate(&args.skills_dir, &args.plugins_dir).await?;
             Ok(if had_errors {
                 ExitCode::from(1)
             } else {
@@ -53,7 +59,7 @@ pub async fn run(args: Cli) -> anyhow::Result<ExitCode> {
         }
         Command::Build => {
             let BuildOutcome { had_errors, .. } =
-                pipeline::build(&args.skills_dir, &args.dist_dir).await?;
+                pipeline::build(&args.skills_dir, &args.plugins_dir, &args.dist_dir).await?;
             Ok(if had_errors {
                 ExitCode::from(1)
             } else {
@@ -64,7 +70,7 @@ pub async fn run(args: Cli) -> anyhow::Result<ExitCode> {
             let BuildOutcome {
                 artifacts,
                 had_errors,
-            } = pipeline::build(&args.skills_dir, &args.dist_dir).await?;
+            } = pipeline::build(&args.skills_dir, &args.plugins_dir, &args.dist_dir).await?;
 
             if had_errors {
                 anyhow::bail!("aborting upload: at least one skill failed parsing or validation");

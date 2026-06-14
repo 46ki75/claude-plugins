@@ -1,5 +1,6 @@
-//! CLI orchestrator that validates, archives, and publishes the skills under
-//! `skills/`.
+//! CLI orchestrator that validates, archives, and publishes Agent Skills from
+//! both channels: standalone skills under `skills/` and plugin-bundled skills
+//! under `plugins/*/skills/`.
 //!
 //! Subcommands:
 //!

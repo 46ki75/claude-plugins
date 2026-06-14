@@ -11,10 +11,15 @@ pub struct BuildOutcome {
     pub had_errors: bool,
 }
 
-pub async fn scan_and_validate(skills_dir: &Path) -> anyhow::Result<(Vec<ParsedSkill>, bool)> {
-    let mut entries = tokio::fs::read_dir(skills_dir)
-        .await
-        .with_context(|| format!("reading {}", skills_dir.display()))?;
+/// Returns the immediate subdirectories of `parent`, sorted. A missing `parent`
+/// yields an empty list rather than an error, so callers can point at optional
+/// roots (e.g. an empty `skills/` staging area) without special-casing.
+async fn collect_subdirs(parent: &Path) -> anyhow::Result<Vec<PathBuf>> {
+    let mut entries = match tokio::fs::read_dir(parent).await {
+        Ok(e) => e,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(e) => return Err(e).with_context(|| format!("reading {}", parent.display())),
+    };
 
     let mut dirs: Vec<PathBuf> = Vec::new();
     while let Some(e) = entries.next_entry().await? {
@@ -23,6 +28,32 @@ pub async fn scan_and_validate(skills_dir: &Path) -> anyhow::Result<(Vec<ParsedS
         }
     }
     dirs.sort();
+    Ok(dirs)
+}
+
+/// Discovers every skill directory across both distribution channels:
+/// standalone skills under `<skills_dir>/*` and plugin-bundled skills under
+/// `<plugins_dir>/*/skills/*`. Returns the combined, sorted list.
+pub async fn discover_skill_dirs(
+    skills_dir: &Path,
+    plugins_dir: &Path,
+) -> anyhow::Result<Vec<PathBuf>> {
+    let mut dirs = collect_subdirs(skills_dir).await?;
+
+    for plugin in collect_subdirs(plugins_dir).await? {
+        let plugin_skills = plugin.join("skills");
+        dirs.extend(collect_subdirs(&plugin_skills).await?);
+    }
+
+    dirs.sort();
+    Ok(dirs)
+}
+
+pub async fn scan_and_validate(
+    skills_dir: &Path,
+    plugins_dir: &Path,
+) -> anyhow::Result<(Vec<ParsedSkill>, bool)> {
+    let dirs = discover_skill_dirs(skills_dir, plugins_dir).await?;
 
     let mut valid: Vec<ParsedSkill> = Vec::new();
     let mut parse_errors: Vec<(PathBuf, ParseError)> = Vec::new();
@@ -45,13 +76,30 @@ pub async fn scan_and_validate(skills_dir: &Path) -> anyhow::Result<(Vec<ParsedS
         }
     }
 
-    let had_errors = !parse_errors.is_empty() || !validation_reports.is_empty();
+    // A skill's `name` becomes its release tag (`agent-skills-<name>-v...`), so
+    // two skills sharing a name across the standalone and plugin channels would
+    // silently overwrite each other's archive. Flag any collision as an error.
+    let mut seen: std::collections::HashMap<&str, &Path> = std::collections::HashMap::new();
+    let mut duplicates: Vec<(String, PathBuf, PathBuf)> = Vec::new();
+    for skill in &valid {
+        if let Some(prev) = seen.insert(&skill.frontmatter.name, &skill.dir_path) {
+            duplicates.push((
+                skill.frontmatter.name.clone(),
+                prev.to_path_buf(),
+                skill.dir_path.clone(),
+            ));
+        }
+    }
+
+    let had_errors =
+        !parse_errors.is_empty() || !validation_reports.is_empty() || !duplicates.is_empty();
 
     tracing::info!(
         total = dirs.len(),
         valid = valid.len(),
         parse_failures = parse_errors.len(),
         validation_failures = validation_reports.len(),
+        duplicate_names = duplicates.len(),
         "skill scan complete"
     );
 
@@ -61,12 +109,24 @@ pub async fn scan_and_validate(skills_dir: &Path) -> anyhow::Result<(Vec<ParsedS
     for r in &validation_reports {
         tracing::error!("{r}");
     }
+    for (name, first, second) in &duplicates {
+        tracing::error!(
+            name = %name,
+            first = %first.display(),
+            second = %second.display(),
+            "duplicate skill name (would collide on release tag)"
+        );
+    }
 
     Ok((valid, had_errors))
 }
 
-pub async fn build(skills_dir: &Path, dist_dir: &Path) -> anyhow::Result<BuildOutcome> {
-    let (valid, had_errors) = scan_and_validate(skills_dir).await?;
+pub async fn build(
+    skills_dir: &Path,
+    plugins_dir: &Path,
+    dist_dir: &Path,
+) -> anyhow::Result<BuildOutcome> {
+    let (valid, had_errors) = scan_and_validate(skills_dir, plugins_dir).await?;
 
     if had_errors {
         // Skip clean_dist and archiving entirely so a failing run does not wipe a
@@ -81,7 +141,11 @@ pub async fn build(skills_dir: &Path, dist_dir: &Path) -> anyhow::Result<BuildOu
     if valid.is_empty() {
         // No skills to archive — don't wipe a previously-good `dist/` on a scan that
         // simply found nothing.
-        tracing::warn!(skills_dir = %skills_dir.display(), "no valid skills found; leaving dist/ untouched");
+        tracing::warn!(
+            skills_dir = %skills_dir.display(),
+            plugins_dir = %plugins_dir.display(),
+            "no valid skills found; leaving dist/ untouched"
+        );
         return Ok(BuildOutcome {
             artifacts: Vec::new(),
             had_errors,
