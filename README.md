@@ -28,15 +28,15 @@ issues/PRs aren't actively triaged.
 | `authoring` | Skills | Markdown linting/fixing and Mermaid diagrams. |
 | `conventional-commits` | Skills | Conventional Commits messages. |
 | `development-standards` | Skills | Org-internal engineering standards. |
-| `kedb` | Skills | Known Error Database maintenance. |
 | `rust` | Skills | Toasty ORM (v0.7) guidance. |
 | `wsl-notification` | Hooks | Windows toast notifications for Claude Code events from WSL2. |
 
 ## Layout
 
 - `plugins/` — published plugins, each a marketplace entry.
-- `skills/` — Agent Skills not yet bundled into a plugin (staging area; see
-  "Migration status" below).
+- `skills/` — standalone Agent Skills that are intentionally **not** published
+  as marketplace plugins (e.g. `kedb`), plus a staging area for new skills
+  before they are bundled into a plugin.
 - `crates/` — Rust workspace that validates, archives, and publishes skill ZIPs
   to the agentskills.io release channel.
 - `.agents/skills/` — skills authored by other providers (reference only).
@@ -62,8 +62,8 @@ a matter of placing their directories under `skills/`.
 ## Migration status
 
 This repo was migrated from the former `46ki75/skills` repository, where the
-15 skills were distributed as agentskills.io ZIP releases. All of them are now
-bundled into Claude Code plugins:
+15 skills were distributed as agentskills.io ZIP releases. Fourteen are now
+published as Claude Code plugins:
 
 | Plugin | Bundled skills |
 | --- | --- |
@@ -75,11 +75,10 @@ bundled into Claude Code plugins:
 | `authoring` | `markdown`, `mermaid` |
 | `conventional-commits` | `conventional-commits` |
 | `development-standards` | `development-standards` |
-| `kedb` | `kedb` |
 | `rust` | `rust-toasty` |
 
-The top-level `skills/` directory is now an empty staging area for new skills
-before they are bundled into a plugin.
+`kedb` is kept as a standalone skill under `skills/kedb/` — it maintains a
+local Known Error Database and is intentionally not published as a plugin.
 
 > **Note on the ZIP pipeline:** `skill-cli` (under `crates/`) scans the
 > top-level `skills/` directory one level deep. Skills now live under

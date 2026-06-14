@@ -111,19 +111,6 @@
       ]
     },
     {
-      "name": "kedb",
-      "source": "./plugins/kedb",
-      "description": "Maintains a Known Error Database (KEDB) of documented errors, symptoms, workarounds, and root causes.",
-      "version": "1.0.0",
-      "keywords": [
-        "skill",
-        "kedb",
-        "known-error",
-        "troubleshooting",
-        "operations"
-      ]
-    },
-    {
       "name": "rust",
       "source": "./plugins/rust",
       "description": "Rust development skills. Currently bundles Toasty ORM (v0.7) guidance.",
