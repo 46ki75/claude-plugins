@@ -1,10 +1,10 @@
 {
   "name": "wsl-notification",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Sends Claude Code Notification and Stop events as Windows toast notifications from WSL2 via powershell.exe.",
   "author": {
     "name": "Ikuma Yamashita",
-    "email": "46ki75@gmail.com"
+    "email": "me@ikuma.cloud"
   },
   "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/wsl-notification",
   "repository": "https://github.com/46ki75/claude-plugins",
