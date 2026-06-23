@@ -1,0 +1,19 @@
+{
+  "name": "web-search-agent",
+  "version": "1.0.0",
+  "description": "A subagent for factual web-search questions: classifies stable vs. fluid, searches only when needed, and returns cited, freshness-marked answers.",
+  "author": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/web-search-agent",
+  "repository": "https://github.com/46ki75/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "agent",
+    "subagent",
+    "web-search",
+    "research",
+    "citations"
+  ]
+}

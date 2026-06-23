@@ -122,6 +122,32 @@
       ]
     },
     {
+      "name": "web-search-agent",
+      "source": "./plugins/web-search-agent",
+      "description": "A subagent for factual web-search questions: classifies stable vs. fluid, searches only when needed, and returns cited, freshness-marked answers.",
+      "version": "1.0.0",
+      "keywords": [
+        "agent",
+        "subagent",
+        "web-search",
+        "research",
+        "citations"
+      ]
+    },
+    {
+      "name": "aws-search-agent",
+      "source": "./plugins/aws-search-agent",
+      "description": "A subagent for AWS questions that prefers the bundled AWS Knowledge MCP server over web search and returns cited, freshness-marked answers.",
+      "version": "1.0.0",
+      "keywords": [
+        "agent",
+        "subagent",
+        "aws",
+        "mcp",
+        "documentation"
+      ]
+    },
+    {
       "name": "wsl-notification",
       "source": "./plugins/wsl-notification",
       "description": "Sends Claude Code permission-prompt Notifications and Stop events as Windows toast notifications from WSL2 via powershell.exe.",
