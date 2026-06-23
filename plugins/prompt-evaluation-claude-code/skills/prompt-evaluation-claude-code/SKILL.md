@@ -20,7 +20,7 @@ description: >
 license: MIT
 metadata:
   author: "Ikuma Yamashita"
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Prompt Evaluation — Claude Code
@@ -158,28 +158,48 @@ mechanics.
 
 ## Model selection
 
-Two subagent roles, two model choices. The `Agent` tool's `model`
-parameter (`haiku` / `sonnet` / `opus` / `fable`) is how you set
-them.
+Two subagent roles plus the main session, three model choices. The
+`Agent` tool's `model` parameter (`haiku` / `sonnet` / `opus` /
+`fable`) sets each subagent; the main session keeps the model you
+launched it with.
 
-- **Candidate (subject under test) → set `model` to the prompt's
-  deployment target.** The candidate model *is* part of what you're
-  testing: a prompt's behavior is model-specific, so grade the
-  model the prompt will actually ship on. When the target is
-  unspecified or you're in early, cost-sensitive exploration,
-  default to `model: "haiku"` — the cheapest, fastest option for a
-  wide fan-out.
-- **Judge → omit `model` to inherit the session's (strong) model.**
-  Grading benefits from the most capable model available. Keeping
-  the judge on the session model while candidates run on Haiku also
-  buys a cross-family split for free — the self-enhancement
-  mitigation the skill otherwise can't reach (pitfall 6).
+**The table below is the *default* strategy. If the user specifies a
+model for any role, follow their instruction instead.**
 
-So the typical run is **candidates on Haiku, judges on whatever the
-main session is** (Opus / Sonnet). Raise the candidate `model` to
-match your real deployment target whenever fidelity matters more
-than cost — a prompt tuned against Haiku is not guaranteed to
-behave the same on Opus.
+| Role | Default | Why |
+| --- | --- | --- |
+| Authoring + synthesis (main session) | Opus | Case/rubric design and failure-clustering are the reasoning-heavy, low-volume parts. |
+| Candidate (subject under test) | Haiku — the *floor* | Cheap, fast fan-out; validates the weakest model the prompt could run on. |
+| Judge | strong session model (Opus) | Grading wants the most capable model, and keeps the judge a tier above the candidate (pitfall 6). |
+
+**Candidate — deployment target vs. floor.** The candidate model
+*is* part of what you test; a prompt's behavior is model-specific.
+
+- **Fixed ship model** → set the candidate `model` to that target.
+  Grade what you deploy.
+- **Ships as `model: inherit`** (an agent that tracks the caller's
+  session — most subagent plugins in this repo) → there is no single
+  target, so default to **`haiku` as the validated floor**: if the
+  weakest model a caller could inherit clears the bar, every richer
+  model (`inherit` → Sonnet/Opus) can only do better, so a passing
+  floor validates the whole inherit range — cheaply. Also default to
+  `haiku` for early, cost-sensitive exploration.
+
+**Judge → omit `model`** so it inherits the session's strong model
+(Opus). A strong judge over Haiku candidates also buys a cross-tier
+split for free — the self-enhancement mitigation of pitfall 6.
+
+**Discipline — spot-check at the ship model before certifying.**
+Iterate at the Haiku floor, but before calling a candidate version
+done, run the set **once at the model it actually ships on** (for an
+`inherit` agent invoked from an Opus session, that's Opus). More
+capable models occasionally regress a rubric the floor passed
+(over-caveating, verbosity, over-thinking) — non-monotonicity is
+rare but real. Don't certify on the floor alone, and stamp the
+candidate model next to the eval-set version in `results.md`.
+
+So the typical run is **candidates on Haiku, judge on the strong
+session model (Opus)** — unless the user pins specific models.
 
 ## Spawning candidate subagents
 
