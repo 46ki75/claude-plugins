@@ -20,7 +20,7 @@ description: >
 license: MIT
 metadata:
   author: "Ikuma Yamashita"
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Prompt Evaluation — Claude Code
@@ -156,6 +156,31 @@ are the interface.
 That is the whole loop. Subsequent sections drill into the
 mechanics.
 
+## Model selection
+
+Two subagent roles, two model choices. The `Agent` tool's `model`
+parameter (`haiku` / `sonnet` / `opus` / `fable`) is how you set
+them.
+
+- **Candidate (subject under test) → set `model` to the prompt's
+  deployment target.** The candidate model *is* part of what you're
+  testing: a prompt's behavior is model-specific, so grade the
+  model the prompt will actually ship on. When the target is
+  unspecified or you're in early, cost-sensitive exploration,
+  default to `model: "haiku"` — the cheapest, fastest option for a
+  wide fan-out.
+- **Judge → omit `model` to inherit the session's (strong) model.**
+  Grading benefits from the most capable model available. Keeping
+  the judge on the session model while candidates run on Haiku also
+  buys a cross-family split for free — the self-enhancement
+  mitigation the skill otherwise can't reach (pitfall 6).
+
+So the typical run is **candidates on Haiku, judges on whatever the
+main session is** (Opus / Sonnet). Raise the candidate `model` to
+match your real deployment target whenever fidelity matters more
+than cost — a prompt tuned against Haiku is not guaranteed to
+behave the same on Opus.
+
 ## Spawning candidate subagents
 
 A candidate subagent simulates one execution of the prompt under
@@ -165,6 +190,7 @@ test on one eval input. The pattern:
 Agent({
   description: "Run candidate v1 on eval-3",
   subagent_type: "general-purpose",
+  model: "haiku",   // deployment target; Haiku = cheap default
   prompt: """
     You are a subject under test. The instructions below are the
     only instructions you should follow. Do not consult any tools
@@ -210,7 +236,9 @@ Critical pitfalls live at `references/pitfalls.md`.
 
 A judge subagent grades one candidate output against one criterion.
 The pattern is the same shape as a candidate run — file-based output,
-no tools except Write, fresh context.
+no tools except Write, fresh context — except you omit the `model`
+override so the judge runs on the session's strong model (see
+*Model selection*).
 
 Defaults (cross-referenced to `prompt-evaluation`):
 
@@ -306,9 +334,12 @@ The subagent-as-eval-runner pattern has failure modes that
 5. **Position bias in pairwise.** Mitigation: always swap, always
    gate on agreement.
 6. **Self-enhancement when the judge model is the same family as
-   the candidate.** Mitigation: if budget allows, use a different
-   model for the judge — e.g. Haiku as judge for an Opus candidate,
-   or vice versa.
+   the candidate.** Mitigation: the default model split already
+   helps — candidates on Haiku, judge on the session model (see
+   *Model selection*) keeps them on different tiers. When candidate
+   and judge must share a model, prefer reference-guided judging
+   (no self-enhancement failure mode) and note the caveat when
+   reporting results.
 
 Full list with mitigations at `references/pitfalls.md`.
 
