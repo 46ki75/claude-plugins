@@ -24,6 +24,12 @@ calibration step you should run before trusting any judge.
 - **Calibrate before trusting.** Hand-grade 25–50 samples
   yourself, compare against the judge, target Cohen's κ ≥ 0.6
   ("substantial agreement") and raw agreement ≥ 80 %.
+- **Run the judge on the session's strong model.** Omit the `model`
+  parameter on the judge `Agent` call so it inherits the session
+  model (Opus / Sonnet) rather than dropping to the cheap candidate
+  model. Grading wants the most capable model, and pairing a strong
+  judge with Haiku candidates creates the cross-family split that
+  defuses self-enhancement bias (see below).
 
 ## Binary judge — canonical prompt shape
 
@@ -209,7 +215,7 @@ Measured effect sizes on Claude:
 | --- | --- | --- |
 | Position (pairwise) | 75 % first-position preference | Swap + agreement gate |
 | Verbosity | 91 % prefer longer answers | Add "ignore length unless concision is a scored criterion" |
-| Self-enhancement | +25 % own-family win rate | Use a different model family as judge when possible |
+| Self-enhancement | +25 % own-family win rate | Split tiers: Haiku candidates, session-model judge (the skill default) |
 | Halo | Compound rubrics produce correlated scores | One isolated judge per criterion |
 
 Source: *Judging LLM-as-a-Judge with MT-Bench* (Zheng et al.,

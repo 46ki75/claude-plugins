@@ -64,8 +64,11 @@ for each batch to fully complete before sending the next.
 
 ## Cost shape
 
-Each subagent invocation consumes tokens at the same rate as the
-main session model. Rough budget:
+Each subagent invocation consumes tokens at the rate of **its own**
+model, not the main session's — so the default split (candidates on
+Haiku, judges on the session model) makes the candidate half of
+every iteration markedly cheaper. See SKILL.md → *Model selection*.
+Rough budget:
 
 - A small candidate run (50-token prompt under test, 100-token
   output) = ~500 tokens of subagent context, billed at the

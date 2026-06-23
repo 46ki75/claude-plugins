@@ -63,6 +63,7 @@ in the return message; the verdict must be in the file.
 Agent({
   description: "Judge v{V} on eval-{ID}",
   subagent_type: "general-purpose",
+  // omit `model` — judge inherits the session's strong model
   prompt: <the filled-in template above>
 })
 ```

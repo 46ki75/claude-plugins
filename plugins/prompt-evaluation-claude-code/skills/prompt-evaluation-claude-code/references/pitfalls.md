@@ -139,12 +139,16 @@ candidate, the candidate wins suspiciously often.
 **Cause.** Measured Claude self-enhancement: +25 % own-family win
 rate (MT-Bench).
 
-**Mitigation.** Use a different family as judge when possible.
-For internal Claude Code use this often isn't actionable — you're
-stuck with the model the session is on — but at minimum, note the
-caveat when reporting results, and prefer reference-guided judging
-when a reference exists (which doesn't have a self-enhancement
-failure mode).
+**Mitigation.** Split the tiers — this is now actionable via the
+`Agent` tool's per-call `model` parameter. The skill default does
+it for you: candidates run on `model: "haiku"`, the judge inherits
+the session's stronger model (Opus / Sonnet). Different tiers, no
+shared-model self-enhancement loop. Note that they are still the
+same vendor, so this reduces rather than fully eliminates the bias;
+when candidate and judge genuinely must share a model, prefer
+reference-guided judging (no self-enhancement failure mode) and
+note the caveat when reporting results. See SKILL.md → *Model
+selection*.
 
 ### Verbosity bias
 

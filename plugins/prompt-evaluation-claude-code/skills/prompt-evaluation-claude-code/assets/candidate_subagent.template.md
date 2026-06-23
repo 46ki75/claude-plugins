@@ -42,6 +42,8 @@ in the return message; the answer must be in the file.
 Agent({
   description: "Run candidate v{V} on eval-{ID}",
   subagent_type: "general-purpose",
+  model: "haiku",   // set to the prompt's deployment target;
+                    //   Haiku = cheap default for exploration
   prompt: <the filled-in template above>
 })
 ```

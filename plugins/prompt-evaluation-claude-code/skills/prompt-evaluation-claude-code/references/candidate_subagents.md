@@ -113,6 +113,7 @@ defect to paper over.
 Agent({
   description: "Run candidate v1 on eval-3",
   subagent_type: "general-purpose",
+  model: "haiku",   // deployment target; Haiku = cheap default
   prompt: "<the canonical prompt shape above, filled in>"
 })
 ```
@@ -122,6 +123,14 @@ Agent({
 - `subagent_type: "general-purpose"` gives Write. Other
   subagent_types may be more restrictive (`Explore` is
   read-only — useless here since the subagent must Write).
+- `model` sets the subject under test. **Match it to the prompt's
+  deployment target** — the candidate model is part of what you're
+  grading, and a prompt tuned on one model is not guaranteed to
+  behave the same on another. Default to `"haiku"` for cheap, fast
+  exploration when the target is unspecified. Omitting `model`
+  inherits the session model, which is usually overkill (and more
+  expensive) for candidate runs. Judges are the opposite — see
+  `judge_subagents.md`.
 - `prompt` is the full single-string blob.
 
 ## File layout the subagent writes to

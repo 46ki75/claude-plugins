@@ -65,6 +65,7 @@ Then return the single word DONE.
 Agent({
   description: "Pairwise call 1: v1=A, v2=B on eval-{ID}",
   subagent_type: "general-purpose",
+  // omit `model` — judge inherits the session's strong model
   prompt: <template with v1 pasted into <candidate_a>, v2 into <candidate_b>, call_index=1>
 })
 ```
@@ -75,6 +76,7 @@ Agent({
 Agent({
   description: "Pairwise call 2: v1=B, v2=A on eval-{ID}",
   subagent_type: "general-purpose",
+  // omit `model` — judge inherits the session's strong model
   prompt: <template with v2 pasted into <candidate_a>, v1 into <candidate_b>, call_index=2>
 })
 ```
