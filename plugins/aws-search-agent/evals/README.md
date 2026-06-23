@@ -3,7 +3,8 @@
 Eval cases for the `aws-search` subagent, run with the
 `prompt-evaluation-claude-code` skill (subagents as eval runners — no SDK, no
 API key). `eval-set-v1.jsonl` holds 6 cases; `eval-set-v2.jsonl` is its
-successor (the same 6 plus `aws-07`, the AWS Lambda MicroVMs case).
+successor (the same 6 plus `aws-07` MicroVMs and `aws-08` Q Developer
+deprecation).
 
 Iteration run artifacts (candidate outputs, judge verdicts) are ephemeral and
 kept in the session scratchpad, not committed; only the versioned eval set lives
@@ -27,7 +28,7 @@ for a viable set) and carry `"source": "new"`:
 4. Security high-stakes — S3 Block Public Access vs. a bucket policy (primary
    AWS docs only).
 
-`eval-set-v2.jsonl` adds one more `"source": "new"` case:
+`eval-set-v2.jsonl` adds two more `"source": "new"` cases:
 
 1. `aws-07` — AWS Lambda MicroVMs, announced 2026-06-22 (two days before the case
    was written), i.e. firmly past the model's training cutoff. The question bundles
@@ -36,6 +37,13 @@ for a viable set) and carry `"source": "new"`:
    Knowledge MCP (web only as a fallback for a very recent announcement), refuses
    to guess specs/pricing/regions from memory, treats pricing as cost-impacting,
    and does not over-confidently claim the service does not exist.
+2. `aws-08` — Amazon Q Developer deprecation. Tests the opposite staleness
+   direction from `aws-02`/`aws-07`: not an unknown new service, but a service the
+   model *does* know from training whose lifecycle status changed underneath it
+   (the "stale-positive" trap). The input is deliberately non-leading — it asks for
+   a setup walkthrough — so a stale agent is tempted to confidently write a guide
+   for a product now on an end-of-support path. A passing answer treats current
+   status/availability as fluid and would verify before giving definitive steps.
 
 ### aws-07 reference facts (for a future live-retrieval grade)
 
@@ -58,6 +66,24 @@ Confirmed via the AWS Knowledge MCP `read_documentation` tool, 2026-06-24:
 - Managed via console, CloudFormation, CDK, CLI/SDK (`lambda-microvms`), and the
   Agent Toolkit for AWS
   (`aws.amazon.com/about-aws/whats-new/2026/06/aws-lambda-microvms/`).
+
+### aws-08 reference facts (for a future live-retrieval grade)
+
+Confirmed via the AWS Knowledge MCP and the official AWS DevOps blog, 2026-06-24.
+The deprecation is **partial** — encode it carefully if grading live:
+
+- End of support announced **2026-04-30** for Amazon Q Developer **IDE plugins**
+  (VS Code, JetBrains, Visual Studio, Eclipse) and **paid Q Developer Pro
+  subscriptions**; **end of support 2027-04-30** (12-month window). Successor is
+  **Kiro** (`aws.amazon.com/blogs/devops/amazon-q-developer-end-of-support-announcement/`).
+- **Not** fully discontinued: Amazon Q Developer in the **AWS Management Console**
+  and chat apps (Slack / Microsoft Teams) remains available.
+- Milestones: new signups blocked **2026-05-15**; code-transformation successor is
+  **AWS Transform**.
+- Source-depth note: the main product/User-Guide pages still describe Q Developer
+  as active with **no deprecation banner**; the authoritative notice is the DevOps
+  blog plus the User Guide document history
+  (`docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/doc-history.html`).
 
 ## Record format
 
