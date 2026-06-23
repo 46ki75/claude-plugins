@@ -12,6 +12,8 @@
 //!   - upload the ZIP to the existing release if the tag exists but the ZIP
 //!     asset is missing (orphan-asset recovery),
 //!   - skip if the release and asset are already present.
+//! - `sources` — report skills that have drifted from the upstream submodule
+//!   commit they were written against (see each skill's `.sources.json`).
 //!
 //! Logging is controlled via `RUST_LOG` (defaults to `info`). Exit codes:
 //! `0` success, `1` validation failure surfaced via `check`/`build`, `2` any
@@ -20,6 +22,7 @@
 mod cli;
 mod github;
 mod pipeline;
+mod sources;
 
 use std::process::ExitCode;
 

@@ -35,3 +35,17 @@ plugins/ai-protocols/
 
 Claude Code auto-discovers each subdirectory of `skills/` as an Agent Skill, so
 adding or removing a protocol skill is just a matter of editing this directory.
+
+## Staying current
+
+Each skill is a digest of an upstream protocol repository tracked as a git
+submodule, so it can drift as the protocol evolves. To keep them fresh:
+
+- Every skill carries a `.sources.json` recording the upstream repo(s), the
+  paths that feed it, and the commit (`synced`) it currently reflects.
+- `cargo run -p skill-cli -- sources` reports any skill whose `synced` commit
+  has fallen behind the submodule pin over those paths.
+- On a Dependabot submodule bump, CI detects the drift and opens an automated
+  PR (authored by Claude) that refreshes the affected skills, bumps their
+  `metadata.version`, and advances `synced`. See the repository's `AGENTS.md`
+  ("Knowledge-skill freshness") for the full flow.
