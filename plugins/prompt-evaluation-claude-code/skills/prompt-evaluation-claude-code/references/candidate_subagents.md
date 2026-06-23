@@ -113,7 +113,7 @@ defect to paper over.
 Agent({
   description: "Run candidate v1 on eval-3",
   subagent_type: "general-purpose",
-  model: "haiku",   // deployment target; Haiku = cheap default
+  model: "haiku",   // ship target, or the Haiku floor for inherit agents
   prompt: "<the canonical prompt shape above, filled in>"
 })
 ```
@@ -126,11 +126,16 @@ Agent({
 - `model` sets the subject under test. **Match it to the prompt's
   deployment target** — the candidate model is part of what you're
   grading, and a prompt tuned on one model is not guaranteed to
-  behave the same on another. Default to `"haiku"` for cheap, fast
-  exploration when the target is unspecified. Omitting `model`
-  inherits the session model, which is usually overkill (and more
-  expensive) for candidate runs. Judges are the opposite — see
-  `judge_subagents.md`.
+  behave the same on another. When the prompt ships as `model:
+  inherit` (no fixed target), default to `"haiku"` as the validated
+  *floor*: a pass there validates every richer model a caller could
+  inherit. Also default to `"haiku"` for cheap, fast exploration when
+  the target is unspecified. Before certifying a version, spot-check
+  once at the real ship model — more capable models occasionally
+  regress a rubric the floor passed. Omitting `model` inherits the
+  session model, which is usually overkill (and more expensive) for
+  candidate runs. Judges are the opposite — see `judge_subagents.md`.
+  This is the default; if the user pins a candidate model, use it.
 - `prompt` is the full single-string blob.
 
 ## File layout the subagent writes to

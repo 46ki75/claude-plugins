@@ -29,7 +29,8 @@ calibration step you should run before trusting any judge.
   model (Opus / Sonnet) rather than dropping to the cheap candidate
   model. Grading wants the most capable model, and pairing a strong
   judge with Haiku candidates creates the cross-family split that
-  defuses self-enhancement bias (see below).
+  defuses self-enhancement bias (see below). This is the default; if
+  the user pins a judge model, use it.
 
 ## Binary judge — canonical prompt shape
 
