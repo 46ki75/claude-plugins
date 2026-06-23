@@ -2865,6 +2865,8 @@ dependencies = [
  "anyhow",
  "clap",
  "octocrab",
+ "serde",
+ "serde_json",
  "skill-archiver",
  "skill-parser",
  "skill-validator",

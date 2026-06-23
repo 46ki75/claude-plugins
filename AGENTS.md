@@ -60,3 +60,30 @@ Run at repository root, not inside `skills/`:
 git submodule update --init --recursive   # first time
 git submodule update --recursive           # keep up to date
 ```
+
+## Knowledge-skill freshness
+
+The `ai-protocols` plugin's skills are hand-curated digests of upstream protocol
+repositories tracked as the submodules above. When a submodule advances, the
+derived skill can go stale. This is tracked and refreshed automatically.
+
+- **Provenance** — each such skill has a `.sources.json` recording, per upstream
+  repo, the `synced` commit it currently reflects and the `paths` that feed it.
+  The leading dot keeps it out of published skill ZIPs (the archiver prunes
+  dotfiles). When a refresh updates a skill, bump `metadata.version` and advance
+  the matching `synced` SHA in the same change.
+- **Detection** — `cargo run -p skill-cli -- sources` reports skills whose
+  `synced` SHA has fallen behind the current submodule pin over the tracked
+  paths (`--json` for machine output, `--exit-code` to fail on drift).
+- **Automation** — `.github/workflows/stale-skill-detect.yml` runs on Dependabot
+  submodule PRs (read-only) and comments which skills drifted;
+  `.github/workflows/stale-skill-refresh.yml` then runs via `workflow_run`
+  (writable token + secrets) to let Claude refresh the stale skills and open a
+  review PR. The two-workflow split is required because Dependabot-triggered
+  runs get a read-only token and no Actions secrets.
+- **Secrets** — refresh reuses the existing `CLAUDE_CODE_OAUTH_TOKEN` secret.
+  Optionally set a `GH_PAT` secret so the refresh PR triggers CI (a PR opened
+  with the default `GITHUB_TOKEN` does not start other workflows).
+
+To onboard a new knowledge skill into this system, add a `.sources.json` to its
+directory.

@@ -44,6 +44,17 @@ pub enum Command {
         #[arg(long)]
         dry_run: bool,
     },
+    /// Report skills that have drifted from the upstream submodule commit they
+    /// were written against, comparing each `.sources.json` `synced` SHA to the
+    /// current submodule pin over the recorded paths.
+    Sources {
+        /// Print the drift report as JSON on stdout instead of a log summary.
+        #[arg(long)]
+        json: bool,
+        /// Exit 1 when any skill is stale (for CI gating). Off by default.
+        #[arg(long)]
+        exit_code: bool,
+    },
 }
 
 pub async fn run(args: Cli) -> anyhow::Result<ExitCode> {
@@ -81,6 +92,21 @@ pub async fn run(args: Cli) -> anyhow::Result<ExitCode> {
             crate::github::upload_new_artifacts(&owner, &name, &artifacts, dry_run).await?;
 
             Ok(ExitCode::SUCCESS)
+        }
+        Command::Sources { json, exit_code } => {
+            let report = crate::sources::detect(&args.skills_dir, &args.plugins_dir).await?;
+
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                crate::sources::log_summary(&report);
+            }
+
+            Ok(if exit_code && report.stale {
+                ExitCode::from(1)
+            } else {
+                ExitCode::SUCCESS
+            })
         }
     }
 }
