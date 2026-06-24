@@ -13,7 +13,7 @@ deserialization, and JSON Schema generation.
 - A tool needs to make a server-to-client request (sampling,
   elicitation, roots) and you need `RequestContext<RoleServer>`.
 - You want a tool that can run synchronously *or* as an async task
-  (SEP-1319).
+  (SEP-1686).
 
 The canonical local example is `crates/mcp-server/src/tools.rs`.
 
@@ -120,7 +120,7 @@ The pattern in `crates/mcp-server/src/tools.rs` (`ask_llm`,
 `greet_user`, `list_workspace_roots`) is the canonical reference for
 each.
 
-## Task-capable tools (SEP-1319)
+## Task-capable tools (SEP-1686)
 
 A tool can opt in to async-task invocation by adding
 `execution(task_support = "optional"|"required")` to the `#[tool]`
