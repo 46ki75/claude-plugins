@@ -20,7 +20,7 @@ description: >
 license: MIT
 metadata:
   author: "Ikuma Yamashita"
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # A2A Skill
@@ -50,7 +50,8 @@ it returns, and the lifecycle of any `Task` it accepts.
 
 ## Version
 
-A2A is at **v1.0.0** (current and stable). Older versions `0.3.0`, `0.2.6`, and
+A2A is at **v1.0.1** (current release — a non-breaking patch over v1.0.0;
+protocol `Major.Minor` is still `1.0`). Older versions `0.3.0`, `0.2.6`, and
 `0.1.0` exist as historical references on `a2a-protocol.org`. v1.0 introduced
 breaking changes from 0.3: enum values switched from `kebab-case` to
 `SCREAMING_SNAKE_CASE`, compound IDs (`tasks/{id}`) were replaced with plain
@@ -75,7 +76,8 @@ Appendix A of `references/specification.md`.
   `TASK_STATE_AUTH_REQUIRED` → `TASK_STATE_COMPLETED` / `TASK_STATE_FAILED` /
   `TASK_STATE_CANCELED` / `TASK_STATE_REJECTED`). Long-running work is modeled
   as a task; short Q&A is just a message.
-- **Message** — one turn of communication. Has a `role` (`user` or `agent`), a
+- **Message** — one turn of communication. Has a `role` (`ROLE_USER` or
+  `ROLE_AGENT`), a
   `messageId`, and one or more `Part` objects. Sent via `SendMessage` (unary)
   or `SendStreamingMessage` (SSE).
 - **Part** — the content container inside Messages and Artifacts. Holds exactly

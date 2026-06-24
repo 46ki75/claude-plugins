@@ -8,7 +8,7 @@ description: >
   lifecycle, OAuth 2.1, utilities) plus the official language SDKs: the
   Rust SDK `rmcp` (full guide — `ServerHandler`/`ClientHandler`,
   `#[tool_router]`/`#[tool_handler]`/`#[task_handler]` macros,
-  `StreamableHttpService`, Cargo features, SEP-1319 tasks, `tokio::io::duplex`
+  `StreamableHttpService`, Cargo features, SEP-1686 tasks, `tokio::io::duplex`
   test harness) and the TypeScript SDK `@modelcontextprotocol/sdk` (incl.
   the `pkce-challenge` Vite/bundler resolver failure). Use when building
   MCP servers or clients in any language, working with transports or
@@ -19,7 +19,7 @@ description: >
 license: MIT
 metadata:
   author: "Ikuma Yamashita"
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # MCP Skill

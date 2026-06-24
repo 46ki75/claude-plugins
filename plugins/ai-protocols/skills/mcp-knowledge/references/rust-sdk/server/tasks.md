@@ -1,4 +1,4 @@
-# Server: tasks (SEP-1319)
+# Server: tasks (SEP-1686)
 
 MCP **tasks** are async, server-side operations: a client calls a tool
 with `task` metadata, the server kicks off the work, returns a task
