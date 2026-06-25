@@ -13,7 +13,6 @@ description: >
   companion claude-md-improver skill instead.
 license: MIT
 argument-hint: "[what to capture, or a target file]"
-disable-model-invocation: false
 metadata:
   author: "Ikuma Yamashita"
   version: "1.0.0"
