@@ -66,6 +66,21 @@ CLAUDE.md                      # lean: repo-wide commands + big-picture architec
 - [how to decide and perform a split](../claude-md-improver/references/splitting-guide.md)
 - [canonical CLAUDE.md and rule shapes](../claude-md-improver/references/templates.md)
 
+## Ask when the codebase can't answer
+
+`/init` analyzes the code, but some memory-worthy facts aren't in it: which
+command is canonical when several exist, where the real architectural boundaries
+lie, deploy/release steps, or a gotcha only the maintainer knows. When the repo
+doesn't settle such a point and guessing would risk a wrong or invented
+instruction, **ask** rather than assume — but keep it light:
+
+- Ask only what you genuinely can't determine from manifests, config, code, or
+  the README. Never ask what the repo already answers.
+- Batch the open questions into a single round (aim for ≤3) with `AskUserQuestion`,
+  each with concrete options and a sensible default first.
+- If the user skips, proceed with the default and note the assumption. Never
+  block the scaffold on an answer.
+
 ## Workflow
 
 ### Step 1: Detect existing memory (improve, don't clobber)
@@ -108,7 +123,8 @@ built-in:
 Gather these by reading build manifests (`package.json`, `justfile`, `Cargo.toml`,
 `pyproject.toml`, `Makefile`), entry points, and the directory layout. Identify
 the distinct **areas** (frontend / api / tests / infra / per-package) — these are
-the split candidates for Step 3.
+the split candidates for Step 3. If several plausible build/test commands exist
+and the code doesn't reveal which is canonical, that's an Ask candidate.
 
 ### Step 3: Decide the split
 
@@ -124,7 +140,8 @@ Apply the "what goes where" guidance from
 - A multi-step procedure rather than a standing fact → suggest a skill, not memory.
 
 Aim to keep the root file under the ~200-line budget, pushing each area-specific
-block down into a rule.
+block down into a rule. Confirm any non-obvious split boundary with the user when
+the code doesn't make it clear.
 
 ### Step 4: Derive and verify `paths:` globs
 

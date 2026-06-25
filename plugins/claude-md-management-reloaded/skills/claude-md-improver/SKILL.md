@@ -126,12 +126,31 @@ Three kinds of recommendation:
 Use [references/templates.md](references/templates.md) for the canonical shapes
 of CLAUDE.md files and rule files.
 
+When a recommendation depends on a fact the codebase can't confirm — is this
+command still canonical, is this note safe to delete — ask before proposing it
+(see "Ask, don't assume" below) rather than guessing.
+
 ### Phase 5: Apply with approval
 
 After approval, apply changes with the Edit/Write tools. When a split creates a
 new rule file, also remove the migrated content from the source `CLAUDE.md` in
 the **same** change so nothing is duplicated across context. Preserve existing
 structure and ordering otherwise.
+
+## Ask, don't assume
+
+Some judgments can't be settled from the codebase: whether a documented command
+that no longer resolves is stale or merely moved, whether a section is truly
+project-wide or path-specific, or which of several commands is canonical. When
+the code doesn't answer and guessing would risk a wrong edit, **ask** rather than
+assume:
+
+- Ask only what the repo can't settle — never re-ask what manifests, config,
+  code, or the report already make clear.
+- Batch the open points into one short round (aim for ≤3) with `AskUserQuestion`,
+  each with concrete options and a sensible default first.
+- If the user skips, fall back to the safest default (usually leave the existing
+  content untouched and flag it) and proceed — never block the audit on an answer.
 
 ## Common issues to flag
 

@@ -51,6 +51,18 @@
         "Includes the real project commands (uv run mytool, pytest, ruff) and only big-picture architecture",
         "Recognizes that a single-area project may need only a lean CLAUDE.md with no rules, and says so rather than forcing a split"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Set up project memory for my Node service. package.json defines three test scripts — `test` (jest), `test:watch`, and `test:ci` (jest with coverage for CI) — and I haven't told you which one is the canonical command to document. There is no CLAUDE.md yet.",
+      "expected_output": "Recognizes that the canonical test command is ambiguous, asks one focused question (via AskUserQuestion) offering the candidate scripts with a sensible default rather than silently guessing, and proceeds to scaffold once the command is chosen or defaulted.",
+      "files": [],
+      "assertions": [
+        "Recognizes that which test command is canonical cannot be determined from the repo alone and does not silently pick one as fact",
+        "Asks the user a focused question (e.g. via AskUserQuestion) listing the candidate test scripts rather than guessing",
+        "Keeps the questioning light: a single batched round with a sensible default, not an open-ended interview",
+        "Still produces the hybrid scaffold (lean CLAUDE.md plus any warranted rules) after the command is chosen or defaulted, without blocking indefinitely"
+      ]
     }
   ]
 }
