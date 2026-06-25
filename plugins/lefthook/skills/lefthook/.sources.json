@@ -1,0 +1,10 @@
+{
+  "skill": "lefthook",
+  "sources": [
+    {
+      "repo": "submodules/lefthook",
+      "synced": "82a794fd37aefdaa0f3615bbf03a32c0414f8fbe",
+      "paths": ["docs"]
+    }
+  ]
+}

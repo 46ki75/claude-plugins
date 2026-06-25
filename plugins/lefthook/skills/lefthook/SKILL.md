@@ -20,7 +20,7 @@ description: >
 license: MIT
 metadata:
   author: "Ikuma Yamashita"
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Lefthook
@@ -35,6 +35,26 @@ Reach for Lefthook whenever the user wants automation on commit/push, wants to
 lint or format only staged files, or is replacing Husky / pre-commit. The rest
 of this skill is the practical model: install → write `lefthook.yml` → install
 hooks → iterate.
+
+## Full reference
+
+This body is the working subset. For exhaustive, upstream-faithful detail —
+every option, flag, and example — read the bundled `references/` files (each
+consolidated from the official lefthook docs):
+
+- `references/configuration.md` — every `lefthook.yml` option (global, remotes,
+  hook, command/job/script) with defaults and examples. Has a table of
+  contents; jump to the option you need. Read this for anything beyond the
+  options summarized below (e.g. `glob_matcher`, `file_types`,
+  `fail_on_changes`, `templates`, `output`, `priority`).
+- `references/cli-commands.md` — full CLI: `install`, `run`, `add`, `validate`,
+  `dump`, `uninstall`, `check-install`, `self-update`, `version` and their flags.
+- `references/installation.md` — all install channels with exact commands.
+- `references/env-vars.md` — `LEFTHOOK`, `LEFTHOOK_*`, `CI`, `NO_COLOR`, etc.
+- `references/features.md` — git-args capture, Git LFS, interactive, local
+  config, passing stdin.
+- `references/examples.md` — worked configs (commitlint, filters, remotes,
+  skipping, stage_fixed, wrapping commands).
 
 ## Install the binary
 
