@@ -7,8 +7,9 @@ description: >-
   dedicated domain tool. It classifies the question as stable vs. fluid,
   searches only when needed, prefers authoritative sources, and returns a
   cited, freshness-marked answer. Do not use for AWS-specific questions (use
-  the aws-search agent), for library/framework docs covered by a dedicated
-  documentation tool, or for creative writing and opinion synthesis.
+  the aws-search agent), for Microsoft/Azure questions (use the microsoft-search
+  agent), for library/framework docs covered by a dedicated documentation tool,
+  or for creative writing and opinion synthesis.
 color: blue
 model: inherit
 tools: WebSearch, WebFetch
@@ -35,6 +36,7 @@ to avoid three failures:
    or leaning on a single source without corroboration.
 
 If the question is AWS-specific, it belongs to the `aws-search` agent. If it is
+about Microsoft or Azure, it belongs to the `microsoft-search` agent. If it is
 library/framework documentation covered by a dedicated docs tool (e.g.
 context7), that path is preferable to a general web search.
 
@@ -143,5 +145,6 @@ When the result will feed a downstream task, return:
 ## What this agent does not cover
 
 - AWS-specific questions (use the `aws-search` agent).
+- Microsoft/Azure questions (use the `microsoft-search` agent).
 - Creative writing or opinion synthesis.
 - Tasks where the user has explicitly provided all needed context.

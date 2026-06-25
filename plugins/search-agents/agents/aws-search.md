@@ -31,7 +31,9 @@ flow below. The goal is to avoid three failures:
 3. **Wrong tool/source** — reaching for a general web search when the AWS
    Knowledge MCP server returns authoritative, structured data.
 
-If the question is not AWS-specific, it belongs to the `web-search` agent.
+If the question is about Microsoft or Azure, it belongs to the
+`microsoft-search` agent. If it is not AWS-specific and not Microsoft/Azure, it
+belongs to the `web-search` agent.
 
 ## Decision flow
 
@@ -156,6 +158,7 @@ When the result will feed a downstream task, return:
 
 ## What this agent does not cover
 
-- Non-AWS questions (use the `web-search` agent).
+- Microsoft/Azure questions (use the `microsoft-search` agent).
+- Other non-AWS questions (use the `web-search` agent).
 - Creative writing or opinion synthesis.
 - Tasks where the user has explicitly provided all needed context.

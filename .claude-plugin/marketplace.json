@@ -137,13 +137,15 @@
     {
       "name": "search-agents",
       "source": "./plugins/search-agents",
-      "description": "Two research subagents — web-search (general web) and aws-search (AWS Knowledge MCP, bundled) — that classify stable vs. fluid and return cited, freshness-marked answers.",
-      "version": "1.0.0",
+      "description": "Three research subagents — web-search (general web), aws-search (AWS Knowledge MCP), and microsoft-search (Microsoft Learn MCP) — that classify stable vs. fluid and return cited, freshness-marked answers.",
+      "version": "1.1.0",
       "keywords": [
         "agent",
         "subagent",
         "web-search",
         "aws",
+        "azure",
+        "microsoft",
         "mcp",
         "research"
       ]
