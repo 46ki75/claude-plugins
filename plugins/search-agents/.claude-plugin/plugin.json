@@ -1,0 +1,20 @@
+{
+  "name": "search-agents",
+  "version": "1.0.0",
+  "description": "Two research subagents — web-search (general web) and aws-search (AWS Knowledge MCP, bundled) — that classify stable vs. fluid and return cited, freshness-marked answers.",
+  "author": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/search-agents",
+  "repository": "https://github.com/46ki75/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "agent",
+    "subagent",
+    "web-search",
+    "aws",
+    "mcp",
+    "research"
+  ]
+}

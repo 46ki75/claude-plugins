@@ -29,6 +29,7 @@ issues/PRs aren't actively triaged.
 | `conventional-commits` | Skills | Conventional Commits messages. |
 | `development-standards` | Skills | Org-internal engineering standards. |
 | `rust` | Skills | Toasty ORM (v0.7) guidance. |
+| `search-agents` | Agents | Web-search and AWS-search research subagents (AWS Knowledge MCP bundled). |
 | `wsl-notification` | Hooks | Windows toast notifications for Claude Code events from WSL2. |
 
 ## Layout
