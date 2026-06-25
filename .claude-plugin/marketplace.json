@@ -163,6 +163,20 @@
         "windows",
         "toast"
       ]
+    },
+    {
+      "name": "claude-md-management-reloaded",
+      "source": "./plugins/claude-md-management-reloaded",
+      "description": "Maintain project memory across CLAUDE.md and .claude/rules/: audit and improve files, split a bloated CLAUDE.md into path-scoped rules, capture session learnings to the right scope, and a hook that warns when CLAUDE.md grows oversized.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "hook",
+        "claude-md",
+        "memory",
+        "rules",
+        "documentation"
+      ]
     }
   ]
 }
