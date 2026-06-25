@@ -13,6 +13,7 @@ description: >
   big", "split this into rules", "review my .claude/rules", "clean up project
   memory" all count.
 license: MIT
+disable-model-invocation: false
 metadata:
   author: "Ikuma Yamashita"
   version: "1.0.0"
@@ -149,7 +150,7 @@ structure and ordering otherwise.
   context and a long file lowers adherence.
 - Right file, right scope: put each instruction where it loads when it is needed
   and nowhere else.
-- Project-specific over generic: document what is true of *this* repo, not
+- Project-specific over generic: document what is true of _this_ repo, not
   universal best practices.
 - Never edit user-scope (`~/.claude/`) memory as a side effect of project work.
 
