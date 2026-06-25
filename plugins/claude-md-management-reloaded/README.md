@@ -9,16 +9,25 @@ type the original did not use.
 
 ## What's new vs. the original
 
-| Area               | Original                    | Reloaded                                                        |
-| ------------------ | --------------------------- | --------------------------------------------------------------- |
-| Memory surface     | `CLAUDE.md` only            | `CLAUDE.md` + `.claude/rules/` + `CLAUDE.local.md` + user scope |
-| Bloat handling     | Flags a long file           | Splits it into path-scoped rules with `paths:` globs            |
-| Session capture    | `/revise-claude-md` command | A skill that **routes** each learning to the right scope        |
-| Components         | 1 skill + 1 command         | 2 skills + 1 hook                                               |
-| Oversize detection | Manual audit only           | A `PostToolUse` hook that warns automatically on edit           |
+| Area               | Original                         | Reloaded                                                        |
+| ------------------ | -------------------------------- | --------------------------------------------------------------- |
+| Memory surface     | `CLAUDE.md` only                 | `CLAUDE.md` + `.claude/rules/` + `CLAUDE.local.md` + user scope |
+| Bloat handling     | Flags a long file                | Splits it into path-scoped rules with `paths:` globs            |
+| Session capture    | `/revise-claude-md` command      | A skill that **routes** each learning to the right scope        |
+| Scaffolding        | Monolithic `CLAUDE.md` (`/init`) | Hybrid lean `CLAUDE.md` + path-scoped rules (`init-claude-md`)  |
+| Components         | 1 skill + 1 command              | 3 skills + 1 hook                                               |
+| Oversize detection | Manual audit only                | A `PostToolUse` hook that warns automatically on edit           |
 
 ## Components
 
+- **`init-claude-md`** (skill) — scaffold a repo's memory from scratch as a
+  HYBRID layout: a lean root `CLAUDE.md` (repo-wide essentials) plus path-scoped
+  `.claude/rules/*.md` for area-specific conventions. The rules-aware analog of
+  Claude Code's built-in `/init` — it analyzes build/test/lint commands and
+  big-picture architecture, decides what stays in `CLAUDE.md` versus what becomes
+  a rule, verifies each `paths:` glob, and writes only with your approval. If
+  memory already exists it suggests improvements instead of clobbering. Invoke
+  with `/claude-md-management-reloaded:init-claude-md`.
 - **`claude-md-improver`** (skill) — audit and improve memory across every scope.
   Scores each file, then proposes targeted fixes, splits an oversized `CLAUDE.md`
   into `.claude/rules/*.md`, and fixes rule scope/globs. Invoke with
