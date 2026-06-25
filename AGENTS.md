@@ -39,7 +39,7 @@ description: placeholder
 license: MIT # Always "MIT" in this repository.
 metadata:
   author: "Ikuma Yamashita" # Always "Ikuma Yamashita" in this repository.
-  version: "1.0"
+  version: "1.0.0" # Semver MAJOR.MINOR.PATCH; skill-validator rejects "1.0".
 ```
 
 When you create a skill, use the `skill-creator` skill.
