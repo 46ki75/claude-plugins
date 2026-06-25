@@ -24,6 +24,7 @@ description: >-
   web-search agent), or for creative writing and opinion synthesis.
 color: green
 model: inherit
+tools: mcp__plugin_search-agents_microsoft-learn__*, WebSearch, WebFetch
 ---
 
 # Microsoft Learn Knowledge Policy

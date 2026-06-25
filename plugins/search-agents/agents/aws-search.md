@@ -9,6 +9,7 @@ description: >-
   web-search agent) or for creative writing and opinion synthesis.
 color: orange
 model: inherit
+tools: mcp__plugin_search-agents_aws-knowledge__*, WebSearch, WebFetch
 ---
 
 # AWS Knowledge Policy
