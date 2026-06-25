@@ -62,8 +62,8 @@
     {
       "name": "prompt-evaluation-claude-code",
       "source": "./plugins/prompt-evaluation-claude-code",
-      "description": "Eval-driven prompt refinement that runs entirely inside Claude Code via the Agent/Task tooling.",
-      "version": "1.0.0",
+      "description": "Eval-driven prompt refinement that runs entirely inside Claude Code via the Agent/Task tooling, plus a /capture-eval-case skill that turns observed agent failures into regression eval cases.",
+      "version": "1.1.0",
       "keywords": [
         "skill",
         "prompt-engineering",
