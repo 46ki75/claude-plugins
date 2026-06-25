@@ -98,6 +98,19 @@
       ]
     },
     {
+      "name": "lefthook",
+      "source": "./plugins/lefthook",
+      "description": "Set up and configure Lefthook, the fast polyglot Git hooks manager: installation, lefthook.yml authoring, and the CLI.",
+      "version": "1.0.0",
+      "keywords": [
+        "skill",
+        "lefthook",
+        "git-hooks",
+        "pre-commit",
+        "workflow"
+      ]
+    },
+    {
       "name": "development-standards",
       "source": "./plugins/development-standards",
       "description": "Org-internal engineering standards for this organization's projects.",
