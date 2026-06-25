@@ -1,0 +1,47 @@
+{
+  "skill_name": "lefthook",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We just added lefthook to our pnpm monorepo (it's in devDependencies already). Can you set up a pre-commit hook that runs eslint --fix on our staged TS/TSX files and prettier --write on staged json/css/md, and make sure whatever they auto-fix actually ends up in the commit? Should run them at the same time, not one after another.",
+      "expected_output": "A lefthook.yml with a pre-commit hook using parallel: true and two jobs (eslint on *.ts/*.tsx, prettier on json/css/md), each using {staged_files} and stage_fixed: true so fixes are re-staged. Should note hooks auto-install on pnpm install (and that CI=true skips it), or to run `lefthook install`.",
+      "files": [],
+      "expectations": [
+        "Produces a lefthook.yml with a pre-commit hook",
+        "The pre-commit hook sets parallel: true",
+        "Has a job/command running eslint --fix scoped to TS/TSX via glob",
+        "Has a job/command running prettier --write scoped to json/css/md via glob",
+        "Uses {staged_files} for the file list (not {all_files})",
+        "Uses stage_fixed: true so auto-fixed files are re-staged",
+        "Notes hooks auto-install on pnpm install or to run lefthook install (CI=true skips auto-install)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I want commit messages validated with commitlint, and our full test suite + tsc typecheck to run before pushing. How do I wire that up with lefthook?",
+      "expected_output": "A lefthook.yml with a commit-msg hook running commitlint --edit {1}, and a pre-push hook with jobs for the test suite and `tsc --noEmit`. Should mention running `lefthook install` after adding the new hook sections.",
+      "files": [],
+      "expectations": [
+        "Produces a lefthook.yml with a commit-msg hook",
+        "commit-msg runs commitlint with --edit and the message-file arg {1}",
+        "Defines a pre-push hook",
+        "pre-push runs the project's test suite",
+        "pre-push runs a typecheck via tsc --noEmit",
+        "Instructs running lefthook install after adding the new hook sections"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We're on Husky right now but it's slow and our repo has a Ruby API in api/ and a React app in web/. I want to switch to lefthook — rubocop should only touch the Ruby files in the api folder and eslint only the JS in web/. How do I migrate?",
+      "expected_output": "Migration steps: remove .husky/, write lefthook.yml, run lefthook install. A polyglot config with parallel jobs scoped via root: api/ (rubocop, glob *.rb) and root: web/ (eslint, glob js/ts), using {staged_files}. Bonus: stage_fixed for auto-fixers.",
+      "files": [],
+      "expectations": [
+        "Gives migration steps including removing .husky/ and running lefthook install",
+        "Produces a lefthook.yml with parallel jobs",
+        "rubocop scoped to the api/ directory via root and *.rb via glob",
+        "eslint scoped to the web/ directory via root and JS/TS via glob",
+        "Uses {staged_files} for file filtering"
+      ]
+    }
+  ]
+}

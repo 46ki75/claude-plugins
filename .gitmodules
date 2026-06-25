@@ -16,3 +16,6 @@
 [submodule "submodules/ag-ui"]
 	path = submodules/ag-ui
 	url = https://github.com/ag-ui-protocol/ag-ui
+[submodule "submodules/lefthook"]
+	path = submodules/lefthook
+	url = https://github.com/evilmartians/lefthook

@@ -1,0 +1,19 @@
+{
+  "name": "lefthook",
+  "version": "1.1.0",
+  "description": "Set up and configure Lefthook, the fast polyglot Git hooks manager: installation, lefthook.yml authoring, the CLI, and bundled full reference docs.",
+  "author": {
+    "name": "Ikuma Yamashita",
+    "email": "me@ikuma.cloud"
+  },
+  "homepage": "https://github.com/46ki75/claude-plugins/tree/main/plugins/lefthook",
+  "repository": "https://github.com/46ki75/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "skill",
+    "lefthook",
+    "git-hooks",
+    "pre-commit",
+    "workflow"
+  ]
+}
