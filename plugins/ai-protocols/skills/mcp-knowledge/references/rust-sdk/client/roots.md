@@ -1,5 +1,14 @@
 # Client: roots (`list_roots`)
 
+> **SEP-2577 deprecation.** As of rmcp 2.0, roots types and methods
+> (`Root`, `ListRootsResult`, `Peer::list_roots`, `ClientHandler::list_roots`,
+> ...) are marked `#[deprecated]`. They still work — it's a compiler
+> warning, not a hard error — and roots remains part of the protocol. Real
+> code that keeps using them (like the examples on this page) should wrap
+> the call site in
+> `#[allow(deprecated, reason = "SEP-2577 deprecates roots; kept as an example")]`,
+> matching the pattern in `crates/mcp-server/src/tools.rs::list_workspace_roots`.
+
 When a server calls `roots/list`, the client returns the
 filesystem/workspace roots it has exposed (IDE open folders, sandbox
 paths, etc.). `ClientHandler::list_roots` is the hook.
@@ -33,7 +42,7 @@ use rmcp::{
     ClientHandler,
     model::{
         ClientCapabilities, ClientInfo, ErrorData, Implementation,
-        ListRootsResult, RawRoot, Root,
+        ListRootsResult, Root,
     },
     service::{RequestContext, RoleClient},
 };
@@ -43,6 +52,7 @@ struct WorkspaceClient {
     roots: Vec<Root>,
 }
 
+#[allow(deprecated, reason = "SEP-2577 deprecates roots; kept as an example")]
 impl ClientHandler for WorkspaceClient {
     fn get_info(&self) -> ClientInfo {
         ClientInfo::new(
@@ -58,30 +68,33 @@ impl ClientHandler for WorkspaceClient {
         &self,
         _ctx: RequestContext<RoleClient>,
     ) -> Result<ListRootsResult, ErrorData> {
-        Ok(ListRootsResult {
-            roots: self.roots.clone(),
-            meta: None,
-        })
+        Ok(ListRootsResult::new(self.roots.clone()))
     }
 }
 
 fn build_root(uri: &str, name: Option<&str>) -> Root {
-    let raw = match name {
-        Some(n) => RawRoot::new(uri).with_name(n),
-        None => RawRoot::new(uri),
-    };
-    raw.no_annotation()
+    match name {
+        Some(n) => Root::new(uri).with_name(n),
+        None => Root::new(uri),
+    }
 }
 ```
 
+`Root` and `ListRootsResult` are both `#[non_exhaustive]`, so build them
+with `Root::new(uri).with_name(...)` and `ListRootsResult::new(roots)`
+rather than struct literals — the old `Annotated<RawRoot>` wrapper (and
+its `.no_annotation()` constructor) is gone in rmcp 2.0.
+
 ## `Root` shape
 
-A `Root` is `Annotated<RawRoot>`. The two fields on `RawRoot`:
+`Root` is now a flat, `#[deprecated]`, `#[non_exhaustive]` struct — no
+more `Annotated<RawRoot>` wrapper. Its fields:
 
 | Field  | Type             | Meaning                                                                   |
 | ------ | ---------------- | ------------------------------------------------------------------------- |
 | `uri`  | `String`         | The root URI. Use `file:///absolute/path` for filesystem locations        |
 | `name` | `Option<String>` | Display label. If unset, server-side code typically falls back to the URI |
+| `meta` | `Option<Meta>`   | Protocol-level metadata (SEP-1319), set via `.with_meta(...)`             |
 
 URIs should be **absolute** and **normalized**. Servers may compare
 URIs as strings; trailing slashes and `..` segments will cause
@@ -130,5 +143,5 @@ to share. UI clients should:
   `list_roots`
 - `references/rust-sdk/client/handler.md` — the full `ClientHandler` method list
   including `on_resource_*` notifications (analogous live updates)
-- `submodules/mcp-rust-sdk/crates/rmcp/src/handler/client.rs:102-107`
+- `submodules/mcp-rust-sdk/crates/rmcp/src/handler/client.rs:107-112`
   — default implementation of `list_roots`

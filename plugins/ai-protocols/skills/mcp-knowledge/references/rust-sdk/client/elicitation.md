@@ -1,5 +1,12 @@
 # Client: elicitation (`create_elicitation`)
 
+> **Naming note.** As of rmcp 2.0, `CreateElicitationRequestParams` and
+> `CreateElicitationResult` are deprecated aliases — renamed to
+> `ElicitRequestParams` and `ElicitResult`. The old names still compile
+> (with a deprecation warning); this page uses the current names.
+> Unlike sampling/roots/logging, elicitation itself is **not**
+> SEP-2577-deprecated — only these two type names changed.
+
 When a server calls `elicitation/create`, the client is expected to
 prompt the user for input and return their response.
 `ClientHandler::create_elicitation` is the hook.
@@ -21,7 +28,7 @@ The default behavior — automatic decline — is what
 `ClientHandler::create_elicitation`'s default returns:
 
 ```rust
-CreateElicitationResult {
+ElicitResult {
     action: ElicitationAction::Decline,
     content: None,
     meta: None,
@@ -63,8 +70,8 @@ To actually collect data and return it, override
 use rmcp::{
     ClientHandler,
     model::{
-        ClientCapabilities, ClientInfo, CreateElicitationRequestParams,
-        CreateElicitationResult, ElicitationAction, ErrorData, Implementation,
+        ClientCapabilities, ClientInfo, ElicitRequestParams,
+        ElicitResult, ElicitationAction, ErrorData, Implementation,
     },
     service::{RequestContext, RoleClient},
 };
@@ -82,23 +89,19 @@ impl ClientHandler for InteractiveClient {
 
     async fn create_elicitation(
         &self,
-        params: CreateElicitationRequestParams,
+        params: ElicitRequestParams,
         _ctx: RequestContext<RoleClient>,
-    ) -> Result<CreateElicitationResult, ErrorData> {
+    ) -> Result<ElicitResult, ErrorData> {
         match params {
-            CreateElicitationRequestParams::FormElicitationParams {
+            ElicitRequestParams::FormElicitationParams {
                 message,
                 requested_schema,
                 ..
             } => {
                 let content = collect_form_input(&message, &requested_schema).await;
-                Ok(CreateElicitationResult {
-                    action: ElicitationAction::Accept,
-                    content: Some(content),
-                    meta: None,
-                })
+                Ok(ElicitResult::new(ElicitationAction::Accept).with_content(content))
             }
-            CreateElicitationRequestParams::UrlElicitationParams {
+            ElicitRequestParams::UrlElicitationParams {
                 url,
                 elicitation_id,
                 ..
@@ -106,24 +109,25 @@ impl ClientHandler for InteractiveClient {
                 open_url_in_browser(&url).await;
                 // The user will complete the form in the browser; the client
                 // separately receives `on_url_elicitation_notification_complete`.
-                Ok(CreateElicitationResult {
-                    action: ElicitationAction::Accept,
-                    content: None,
-                    meta: None,
-                })
+                Ok(ElicitResult::new(ElicitationAction::Accept))
             }
         }
     }
 }
 ```
 
+`ElicitResult` is `#[non_exhaustive]`, so build it with
+`ElicitResult::new(action)` and, if accepting, `.with_content(value)` —
+a struct literal (`ElicitResult { action, content, meta }`) no longer
+compiles from outside the `rmcp` crate.
+
 `collect_form_input` and `open_url_in_browser` are illustrative —
 they're the parts only your UI knows how to do.
 
-## `CreateElicitationRequestParams` variants
+## `ElicitRequestParams` variants
 
 The request is an enum with two flavors (source:
-`submodules/mcp-rust-sdk/crates/rmcp/src/model.rs:2637-2669`):
+`submodules/mcp-rust-sdk/crates/rmcp/src/model.rs:2773-2812`):
 
 ### `FormElicitationParams`
 
@@ -150,7 +154,7 @@ side surfaces the result via
 `on_url_elicitation_notification_complete` — see
 `references/rust-sdk/client/handler.md` for that callback.
 
-## `ElicitationAction` and `CreateElicitationResult`
+## `ElicitationAction` and `ElicitResult`
 
 | `action`  | Meaning                                                           |
 | --------- | ----------------------------------------------------------------- |
@@ -181,12 +185,12 @@ you can — it's cheaper than a round trip.
 
 For tests, the three patterns are:
 
-| Goal                                | How                                                                                       |
-| ----------------------------------- | ----------------------------------------------------------------------------------------- |
-| Always decline                      | Don't override `create_elicitation`. Just enable the capability                           |
-| Always cancel                       | Override with `Ok(CreateElicitationResult { action: Cancel, content: None, meta: None })` |
-| Always accept with a canned payload | Override with `action: Accept`, `content: Some(serde_json::json!({"name": "test"}))`      |
-| Decline based on the prompt text    | Match on `params` and return `Decline` for one prompt, `Accept` for another               |
+| Goal                                | How                                                                                                            |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Always decline                      | Don't override `create_elicitation`. Just enable the capability                                                |
+| Always cancel                       | Override with `Ok(ElicitResult::new(ElicitationAction::Cancel))`                                               |
+| Always accept with a canned payload | Override with `ElicitResult::new(ElicitationAction::Accept).with_content(serde_json::json!({"name": "test"}))` |
+| Decline based on the prompt text    | Match on `params` and return `Decline` for one prompt, `Accept` for another                                    |
 
 ## See also
 
@@ -195,7 +199,7 @@ For tests, the three patterns are:
 - `references/rust-sdk/client/handler.md` — the full `ClientHandler` method list
 - `crates/mcp-server/tests/elicitation.rs` — `DecliningClient` in
   action
-- `submodules/mcp-rust-sdk/crates/rmcp/src/handler/client.rs:109-178`
+- `submodules/mcp-rust-sdk/crates/rmcp/src/handler/client.rs:114-182`
   — the default implementation with doc-comment examples
 - `submodules/mcp-rust-sdk/examples/servers/src/elicitation_stdio.rs`
   — upstream example exercising form elicitation end-to-end

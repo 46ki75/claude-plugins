@@ -110,5 +110,5 @@ Picking more than one is a compile error. Picking none gives you
 ## Workspace example
 
 The local workspace at `crates/mcp-server/Cargo.toml` consumes `rmcp`
-via the workspace dependency at `Cargo.toml:49-57`. That set is a good
+via the workspace dependency at `Cargo.toml:50-58`. That set is a good
 starting point for any server that needs more than just stdio.

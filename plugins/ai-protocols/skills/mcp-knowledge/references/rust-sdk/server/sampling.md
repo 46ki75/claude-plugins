@@ -5,6 +5,14 @@ the server asks the client's LLM to produce a response. It's the
 mechanism that lets MCP servers do model-mediated work (summaries,
 translation, decisions) without bundling an LLM themselves.
 
+> **Deprecated by SEP-2577.** As of rmcp 2.0, sampling's types and
+> methods (`CreateMessageRequestParams`, `SamplingMessage`,
+> `Peer::create_message`, etc.) carry `#[deprecated]` — a compiler
+> warning, not a hard error. They remain fully functional and are still
+> part of the protocol. Call sites that keep using them (like `ask_llm`
+> below) wrap the call in `#[allow(deprecated, reason = "...")]`; mirror
+> that pattern in your own code.
+
 ## When to read this
 
 - Writing a tool that delegates a reasoning step to the client's LLM.
@@ -14,7 +22,7 @@ translation, decisions) without bundling an LLM themselves.
   your request.
 
 The canonical local example is `ask_llm` in
-`crates/mcp-server/src/tools.rs:81-117`.
+`crates/mcp-server/src/tools.rs:82-128`.
 
 ## The minimum sampling tool
 
@@ -22,11 +30,12 @@ The canonical local example is `ask_llm` in
 use rmcp::{
     ErrorData as McpError, RoleServer,
     handler::server::wrapper::Parameters,
-    model::{CallToolResult, Content, CreateMessageRequestParams, SamplingMessage},
+    model::{CallToolResult, ContentBlock, CreateMessageRequestParams, SamplingMessage},
     service::RequestContext,
     tool,
 };
 
+#[allow(deprecated, reason = "SEP-2577 deprecates sampling; kept as an example")]
 #[tool(description = "Ask the client's LLM a question via sampling.")]
 async fn ask_llm(
     &self,
@@ -54,7 +63,7 @@ async fn ask_llm(
         .map(|t| t.text.clone())
         .unwrap_or_else(|| "(no text response)".to_string());
 
-    Ok(CallToolResult::success(vec![Content::text(text)]))
+    Ok(CallToolResult::success(vec![ContentBlock::text(text)]))
 }
 ```
 
@@ -70,21 +79,30 @@ The pattern:
 
 ## `SamplingMessage` constructors
 
-| Constructor                                | What it makes                        |
-| ------------------------------------------ | ------------------------------------ |
-| `SamplingMessage::user_text("...")`        | User-role text turn                  |
-| `SamplingMessage::assistant_text("...")`   | Assistant-role text turn             |
-| Manual `SamplingMessage { role, content }` | When you need image or audio content |
+| Constructor                                      | What it makes                                                |
+| ------------------------------------------------ | ------------------------------------------------------------ |
+| `SamplingMessage::user_text("...")`              | User-role text turn                                          |
+| `SamplingMessage::assistant_text("...")`         | Assistant-role text turn                                     |
+| `SamplingMessage::new(role, content)`            | Any single `SamplingMessageContentBlock` (image, audio, ...) |
+| `SamplingMessage::new_multiple(role, vec![...])` | Several content blocks in one turn                           |
+
+`SamplingMessage` is `#[non_exhaustive]`, so struct-literal construction
+(`SamplingMessage { role, content, .. }`) no longer compiles outside the
+`rmcp` crate — use the constructors above.
 
 For multi-turn sampling, pass a `Vec<SamplingMessage>`. The model sees
 the messages in order.
 
 ## Iterating response content
 
-`CreateMessageResult.message.content` is a `SamplingContent` enum that
-can carry one (`Single`) or many (`Multiple`) content blocks. Each
-block is a `Content = Annotated<RawContent>` with variants for text,
-image, audio, tool_use, tool_result, etc.
+`CreateMessageResult.message.content` is a
+`SamplingContent<SamplingMessageContentBlock>` enum that can carry one
+(`Single`) or many (`Multiple`) content blocks. Each block is a
+`SamplingMessageContentBlock` (the old name `SamplingMessageContent` is
+now a deprecated type alias) — a flat, `#[non_exhaustive]` enum with
+`Text(TextContent)`, `Image(ImageContent)`, `Audio(AudioContent)`,
+`ToolUse(ToolUseContent)`, and `ToolResult(ToolResultContent)`
+variants.
 
 The canonical extraction pattern is:
 
@@ -98,19 +116,22 @@ let text = response
     .unwrap_or_else(|| "(no text response)".to_string());
 ```
 
-`Content::as_text()` returns `Option<&RawTextContent>`. If you need a
-specific non-text variant, pattern-match on the inner `RawContent`:
+`SamplingMessageContentBlock::as_text()` returns `Option<&TextContent>`.
+If you need a specific non-text variant, pattern-match directly on the
+block:
 
 ```rust
-use rmcp::model::RawContent;
+use rmcp::model::SamplingMessageContentBlock;
 
 for block in response.message.content.iter() {
-    match &block.raw {
-        RawContent::Text(t) => /* t.text */,
-        RawContent::Image(img) => /* img.data, img.mime_type */,
-        RawContent::Audio(_) => /* ... */,
-        RawContent::ToolUse(_) | RawContent::ToolResult(_) => /* SEP-1330 sampling */,
-        _ => /* future variants */,
+    match block {
+        SamplingMessageContentBlock::Text(t) => /* t.text */,
+        SamplingMessageContentBlock::Image(img) => /* img.data, img.mime_type */,
+        SamplingMessageContentBlock::Audio(_) => /* ... */,
+        SamplingMessageContentBlock::ToolUse(_) | SamplingMessageContentBlock::ToolResult(_) => {
+            /* SEP-1577 tool-use extensions to sampling */
+        }
+        _ => /* future variants — the enum is #[non_exhaustive] */,
     }
 }
 ```
@@ -135,7 +156,7 @@ let text = match response.message.content.iter().find_map(|c| c.as_text()) {
 };
 ```
 
-That's how `crates/mcp-server/src/tools.rs:102-115` does it.
+That's how `crates/mcp-server/src/tools.rs:113-126` does it.
 
 ## Required client capability
 
@@ -172,7 +193,7 @@ state — your tool owns it.
 ### Streaming
 
 `create_message` returns the full `CreateMessageResult` once the model
-has finished. There is no server-side streaming API in `rmcp` 1.x. If
+has finished. There is no server-side streaming API in `rmcp` 2.x. If
 you need streaming, you'd have to layer your own protocol on top.
 
 ## Error handling
@@ -199,6 +220,6 @@ sampling), check the error string and substitute a fallback.
 - `references/rust-sdk/server/roots.md` — the sibling server-to-client request
   for workspace listing
 - `references/rust-sdk/client/sampling.md` — implementing the client side
-- `crates/mcp-server/src/tools.rs:81-117` — the `ask_llm` worked example
+- `crates/mcp-server/src/tools.rs:82-128` — the `ask_llm` worked example
 - `submodules/mcp-rust-sdk/examples/servers/src/sampling_stdio.rs` —
   upstream example with multi-turn sampling

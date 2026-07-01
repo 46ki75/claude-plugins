@@ -5,7 +5,7 @@ method has a default, so you only override what you actually need to
 answer.
 
 Trait source: `submodules/mcp-rust-sdk/crates/rmcp/src/handler/client.rs`
-(starting at line 84).
+(starting at line 89).
 
 ## When to read this
 
@@ -25,7 +25,7 @@ These come from `ServerRequest::*` and the client must respond.
 | `ping(ctx) -> Result<(), McpError>`                                            | Returns `Ok(())`                  | none            | Almost never                               |
 | `create_message(params, ctx) -> Result<CreateMessageResult, McpError>`         | Returns `method_not_found`        | `sampling`      | Whenever sampling is enabled               |
 | `list_roots(ctx) -> Result<ListRootsResult, McpError>`                         | Returns empty `ListRootsResult`   | `roots`         | When the client exposes folders            |
-| `create_elicitation(params, ctx) -> Result<CreateElicitationResult, McpError>` | Returns `Decline` with no content | `elicitation`   | Whenever you want to actually ask the user |
+| `create_elicitation(params, ctx) -> Result<ElicitResult, McpError>`            | Returns `Decline` with no content | `elicitation`   | Whenever you want to actually ask the user |
 | `on_custom_request(req, ctx) -> Result<CustomResult, McpError>`                | Returns `method_not_found`        | none            | Handling protocol extensions               |
 
 ### Server-to-client *notifications* (server tells the client about something)
@@ -43,6 +43,7 @@ the method is enough.
 | `on_tool_list_changed(ctx)`                             | no-op   | Re-list tools                                                        |
 | `on_prompt_list_changed(ctx)`                           | no-op   | Re-list prompts                                                      |
 | `on_url_elicitation_notification_complete(params, ctx)` | no-op   | Continue a URL-based elicitation flow once the user finishes the URL |
+| `on_task_status(params, ctx)`                           | no-op   | Track task (SEP-1319) status changes pushed from the server          |
 | `on_custom_notification(notification, ctx)`             | no-op   | Handle protocol extensions                                           |
 
 ### Initialization

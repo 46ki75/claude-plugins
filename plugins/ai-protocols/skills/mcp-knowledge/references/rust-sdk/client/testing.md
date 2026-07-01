@@ -68,7 +68,7 @@ use mcp_server::Server;
 use rmcp::{
     ClientHandler, ServiceExt,
     model::{
-        CallToolRequestParams, ClientRequest, Content, ListToolsRequest, RawContent, Request,
+        CallToolRequestParams, ClientRequest, ContentBlock, ListToolsRequest, Request,
         ServerResult,
     },
 };
@@ -108,13 +108,14 @@ async fn list_tools_returns_the_advertised_set() -> anyhow::Result<()> {
 
 ## Helper: extracting text content
 
-`Content` is `Annotated<RawContent>`, so the `text` lives inside
-`content[i].raw`. A tiny helper keeps the test bodies clean:
+`ContentBlock` is a flat, non-generic enum (`Text | Image | Audio |
+Resource | ResourceLink`) — no more `Annotated<RawContent>` wrapper, so
+there's no `.raw` indirection. A tiny helper keeps the test bodies clean:
 
 ```rust
-fn first_text(content: &[Content]) -> Option<&str> {
-    content.iter().find_map(|c| match &c.raw {
-        RawContent::Text(t) => Some(t.text.as_str()),
+fn first_text(content: &[ContentBlock]) -> Option<&str> {
+    content.iter().find_map(|c| match c {
+        ContentBlock::Text(t) => Some(t.text.as_str()),
         _ => None,
     })
 }
@@ -167,7 +168,7 @@ async fn wait_for_task_status(
 }
 ```
 
-(From `crates/mcp-server/tests/task.rs:30-58`.)
+(From `crates/mcp-server/tests/task.rs:30-56`.)
 
 Use a 5-second timeout for tests that wait on running tasks. The inner
 poll delay (`20ms`) is short enough that the test reacts almost
@@ -204,14 +205,11 @@ override `create_elicitation`:
 ```rust
 async fn create_elicitation(
     &self,
-    _params: CreateElicitationRequestParams,
+    _params: ElicitRequestParams,
     _ctx: RequestContext<RoleClient>,
-) -> Result<CreateElicitationResult, ErrorData> {
-    Ok(CreateElicitationResult {
-        action: ElicitationAction::Accept,
-        content: Some(serde_json::json!({ "name": "Test User" })),
-        meta: None,
-    })
+) -> Result<ElicitResult, ErrorData> {
+    Ok(ElicitResult::new(ElicitationAction::Accept)
+        .with_content(serde_json::json!({ "name": "Test User" })))
 }
 ```
 

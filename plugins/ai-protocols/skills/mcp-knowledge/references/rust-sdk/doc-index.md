@@ -25,8 +25,8 @@ submodule (`submodules/mcp-rust-sdk/`).
 | Path                  | Topic                                                                                                                                                                                                     |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `server/tools.md`     | `#[tool_router]`, `#[tool(description = ...)]`, `Parameters<T>` with `schemars::JsonSchema`, `CallToolResult` shape, `execution(task_support = ...)`, `annotations(...)` and the default-destructive trap |
-| `server/prompts.md`   | `#[prompt_router]`, no-arg + single-arg + multi-arg prompts, `PromptMessageRole`, `GetPromptResult::with_description`                                                                                     |
-| `server/resources.md` | Why there is no macro router for resources; `list_resources` / `read_resource` / `list_resource_templates`; URI scheme dispatch with `strip_prefix`; `RawResource` / `RawResourceTemplate` builders       |
+| `server/prompts.md`   | `#[prompt_router]`, no-arg + single-arg + multi-arg prompts, `Role`, `GetPromptResult::with_description`                                                                                                  |
+| `server/resources.md` | Why there is no macro router for resources; `list_resources` / `read_resource` / `list_resource_templates`; URI scheme dispatch with `strip_prefix`; `Resource` / `ResourceTemplate` builders             |
 | `server/tasks.md`     | SEP-1686 lifecycle, `OperationProcessor`, `#[task_handler]` macro contract, the canonical `list_tasks` override, cancellation string-matching, timestamp limitation                                       |
 
 ### Server-to-client requests
@@ -64,7 +64,7 @@ submodule (`submodules/mcp-rust-sdk/`).
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `client/sampling.md`    | Overriding `create_message`, `CreateMessageRequestParams` fields, stop-reason constants, forwarding to a real LLM                       |
 | `client/elicitation.md` | Overriding `create_elicitation`, `ElicitationAction` (`Accept` / `Decline` / `Cancel`), form vs URL variants, default-decline behavior  |
-| `client/roots.md`       | Overriding `list_roots`, `RawRoot::new(...).with_name(...)`, list-changed notifications, static vs dynamic roots                        |
+| `client/roots.md`       | Overriding `list_roots`, `Root::new(...).with_name(...)`, list-changed notifications, static vs dynamic roots                           |
 
 ### Transports and testing
 
