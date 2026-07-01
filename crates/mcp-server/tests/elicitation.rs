@@ -1,6 +1,6 @@
 //! Regression test for the `greet_user` tool's elicitation handling.
 //!
-//! `Peer::elicit` in rmcp 1.7 returns
+//! `Peer::elicit` in rmcp 2.0 returns
 //! `Err(ElicitationError::UserDeclined)` / `UserCancelled` (see
 //! `submodules/mcp-rust-sdk/crates/rmcp/src/service/server.rs:768-769`)
 //! when the user explicitly declines or cancels — those are user actions,
@@ -19,8 +19,8 @@ use mcp_server::Server;
 use rmcp::{
     ClientHandler, ServiceExt,
     model::{
-        CallToolRequestParams, ClientCapabilities, ClientInfo, ClientRequest, Content,
-        Implementation, RawContent, Request, ServerResult,
+        CallToolRequestParams, ClientCapabilities, ClientInfo, ClientRequest, ContentBlock,
+        Implementation, Request, ServerResult,
     },
 };
 
@@ -72,9 +72,9 @@ async fn declined_elicitation_returns_a_graceful_success() -> anyhow::Result<()>
     Ok(())
 }
 
-fn first_text(content: &[Content]) -> Option<&str> {
-    content.iter().find_map(|c| match &c.raw {
-        RawContent::Text(t) => Some(t.text.as_str()),
+fn first_text(content: &[ContentBlock]) -> Option<&str> {
+    content.iter().find_map(|c| match c {
+        ContentBlock::Text(t) => Some(t.text.as_str()),
         _ => None,
     })
 }

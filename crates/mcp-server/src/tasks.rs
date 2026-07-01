@@ -18,7 +18,7 @@ use crate::Server;
 /// # Caveats
 ///
 /// `OperationProcessor` does not expose per-task `created_at` /
-/// `last_updated_at` timestamps in rmcp 1.7, so both fields are set to the
+/// `last_updated_at` timestamps in rmcp 2.0, so both fields are set to the
 /// time `list_tasks` was called. A task that has been running for several
 /// minutes will appear to have just been created. Switch to the upstream
 /// fields once they become public.
@@ -38,7 +38,7 @@ pub async fn list_tasks(server: &Server) -> Result<ListTasksResult, McpError> {
         // `OperationProcessor::cancel_task` records cancellations as
         // `Err(TaskError("Operation cancelled"))` and timeouts as
         // `Err(TaskError("Operation timed out"))`. `TaskResult` exposes no
-        // structured discriminator in rmcp 1.7, so we string-match on the
+        // structured discriminator in rmcp 2.0, so we string-match on the
         // rendered error to distinguish cancellation from other failures.
         // Timeouts intentionally fall through to `Failed`.
         let status = match &result.result {

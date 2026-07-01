@@ -22,8 +22,7 @@ const GREET_RESOURCE_TEMPLATE: &str = "greet://{language}/{name}";
 
 /// Body of `resources/list`. Returns the single static example resource.
 pub fn list_resources(_server: &Server) -> ListResourcesResult {
-    let resource: Resource =
-        RawResource::new(EXAMPLE_RESOURCE_URI, EXAMPLE_RESOURCE_NAME.to_string()).no_annotation();
+    let resource: Resource = Resource::new(EXAMPLE_RESOURCE_URI, EXAMPLE_RESOURCE_NAME.to_string());
     ListResourcesResult {
         resources: vec![resource],
         next_cursor: None,
@@ -89,18 +88,15 @@ pub fn read_resource(
 /// Body of `resources/templates/list`. Returns the `echo://` and `greet://`
 /// resource templates.
 pub fn list_resource_templates(_server: &Server) -> ListResourceTemplatesResult {
-    let echo_template: ResourceTemplate = RawResourceTemplate::new(ECHO_RESOURCE_TEMPLATE, "echo")
+    let echo_template: ResourceTemplate = ResourceTemplate::new(ECHO_RESOURCE_TEMPLATE, "echo")
         .with_description("Reads back whatever appears after `echo://` as plain text.")
-        .with_mime_type("text/plain")
-        .no_annotation();
-    let greet_template: ResourceTemplate =
-        RawResourceTemplate::new(GREET_RESOURCE_TEMPLATE, "greet")
-            .with_description(
-                "Returns a localized greeting for the given language and name. \
-                 Supported languages: en, ja, es, fr.",
-            )
-            .with_mime_type("text/plain")
-            .no_annotation();
+        .with_mime_type("text/plain");
+    let greet_template: ResourceTemplate = ResourceTemplate::new(GREET_RESOURCE_TEMPLATE, "greet")
+        .with_description(
+            "Returns a localized greeting for the given language and name. \
+             Supported languages: en, ja, es, fr.",
+        )
+        .with_mime_type("text/plain");
     ListResourceTemplatesResult {
         resource_templates: vec![echo_template, greet_template],
         next_cursor: None,

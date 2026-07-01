@@ -14,7 +14,7 @@ use rmcp::{
     ClientHandler, RoleClient, ServiceExt,
     model::{
         CallToolRequestParams, CancelTaskParams, ClientRequest, ListTasksRequest, Request,
-        ServerResult, TaskStatus,
+        ServerResult, TaskMetadata, TaskStatus,
     },
     service::RunningService,
 };
@@ -72,15 +72,9 @@ async fn slow_count_can_be_invoked_as_a_task() -> anyhow::Result<()> {
     let mut args = serde_json::Map::new();
     args.insert("target".into(), serde_json::Value::from(3u8));
 
-    let mut task_meta = serde_json::Map::new();
-    task_meta.insert(
-        "source".into(),
-        serde_json::Value::String("integration-test".into()),
-    );
-
     let params = CallToolRequestParams::new("slow_count")
         .with_arguments(args)
-        .with_task(task_meta);
+        .with_task(TaskMetadata::new());
 
     let response = client_service
         .send_request(ClientRequest::CallToolRequest(Request::new(params)))
@@ -123,11 +117,9 @@ async fn list_tasks_surfaces_completed_tasks() -> anyhow::Result<()> {
     // Enqueue a task that finishes quickly (target=1 → ~100ms).
     let mut args = serde_json::Map::new();
     args.insert("target".into(), serde_json::Value::from(1u8));
-    let mut task_meta = serde_json::Map::new();
-    task_meta.insert("source".into(), serde_json::Value::String("test".into()));
     let params = CallToolRequestParams::new("slow_count")
         .with_arguments(args)
-        .with_task(task_meta);
+        .with_task(TaskMetadata::new());
     let response = client_service
         .send_request(ClientRequest::CallToolRequest(Request::new(params)))
         .await?;
@@ -156,7 +148,7 @@ async fn list_tasks_surfaces_completed_tasks() -> anyhow::Result<()> {
 /// Exercises the `Cancelled` branch of the `list_tasks` override in
 /// `src/tasks.rs`. The override distinguishes cancellations from generic
 /// failures by string-matching the underlying `Error::TaskError` message
-/// (rmcp 1.7 has no structured discriminator). This test locks in that
+/// (rmcp 2.0 has no structured discriminator). This test locks in that
 /// behavior so a future upstream change to the error text — or an
 /// accidental flip back to the always-`Failed` branch — fails loudly.
 #[tokio::test]
@@ -176,11 +168,9 @@ async fn list_tasks_reports_cancelled_status_for_cancelled_task() -> anyhow::Res
     // observe `Working` and then cancel it before it can complete.
     let mut args = serde_json::Map::new();
     args.insert("target".into(), serde_json::Value::from(20u8));
-    let mut task_meta = serde_json::Map::new();
-    task_meta.insert("source".into(), serde_json::Value::String("test".into()));
     let params = CallToolRequestParams::new("slow_count")
         .with_arguments(args)
-        .with_task(task_meta);
+        .with_task(TaskMetadata::new());
     let response = client_service
         .send_request(ClientRequest::CallToolRequest(Request::new(params)))
         .await?;
@@ -206,10 +196,7 @@ async fn list_tasks_reports_cancelled_status_for_cancelled_task() -> anyhow::Res
     // assert on the embedded task instead.
     let cancel = client_service
         .send_request(ClientRequest::CancelTaskRequest(Request::new(
-            CancelTaskParams {
-                meta: None,
-                task_id: task_id.clone(),
-            },
+            CancelTaskParams::new(task_id.clone()),
         )))
         .await?;
     let cancelled_task = match cancel {

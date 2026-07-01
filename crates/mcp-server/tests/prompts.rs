@@ -9,10 +9,7 @@
 use mcp_server::Server;
 use rmcp::{
     ClientHandler, ServiceExt,
-    model::{
-        ClientRequest, GetPromptRequestParams, PromptMessageContent, PromptMessageRole, Request,
-        ServerResult,
-    },
+    model::{ClientRequest, ContentBlock, GetPromptRequestParams, Request, Role, ServerResult},
 };
 
 #[derive(Default, Clone)]
@@ -43,11 +40,11 @@ async fn get_echo_prompt_returns_the_supplied_message() -> anyhow::Result<()> {
     };
     assert_eq!(result.messages.len(), 1);
     let message = &result.messages[0];
-    assert_eq!(message.role, PromptMessageRole::User);
-    let PromptMessageContent::Text { text } = &message.content else {
+    assert_eq!(message.role, Role::User);
+    let ContentBlock::Text(text) = &message.content else {
         panic!("expected text content, got {:?}", message.content);
     };
-    assert_eq!(text, "hi");
+    assert_eq!(text.text, "hi");
 
     client_service.cancel().await?;
     let _ = server_handle.await;

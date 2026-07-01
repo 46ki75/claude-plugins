@@ -21,8 +21,7 @@ use mcp_server::Server;
 use rmcp::{
     ClientHandler, ServiceExt,
     model::{
-        CallToolRequestParams, ClientRequest, Content, ListToolsRequest, RawContent, Request,
-        ServerResult,
+        CallToolRequestParams, ClientRequest, ContentBlock, ListToolsRequest, Request, ServerResult,
     },
 };
 
@@ -125,9 +124,9 @@ async fn call_slow_count_synchronously_returns_the_target() -> anyhow::Result<()
     Ok(())
 }
 
-fn first_text(content: &[Content]) -> Option<&str> {
-    content.iter().find_map(|c| match &c.raw {
-        RawContent::Text(t) => Some(t.text.as_str()),
+fn first_text(content: &[ContentBlock]) -> Option<&str> {
+    content.iter().find_map(|c| match c {
+        ContentBlock::Text(t) => Some(t.text.as_str()),
         _ => None,
     })
 }
