@@ -28,7 +28,7 @@ The `rmcp` workspace ships two crates plus a large set of examples:
 | `submodules/mcp-rust-sdk/crates/rmcp-macros/`   | The procedural-macros crate behind `#[tool_router]`, `#[tool_handler]`, `#[prompt_router]`, `#[prompt_handler]`, `#[task_handler]`. Re-exported by `rmcp` when the `macros` feature is on           |
 | `submodules/mcp-rust-sdk/examples/servers/src/` | One example server per primitive (calculator, counter, prompt, task, sampling, elicitation, completion, memory, structured output, OAuth)                                                           |
 | `submodules/mcp-rust-sdk/examples/clients/src/` | Example clients (stdio subprocess, streamable HTTP, sampling, task polling, progress, OAuth flows)                                                                                                  |
-| `crates/mcp-server/`                            | **Local** working server example built against `rmcp` 1.7. Covers every server-side primitive and ships an integration test per feature. This is the canonical reference cited throughout this set  |
+| `crates/mcp-server/`                            | **Local** working server example built against `rmcp` 2.0. Covers every server-side primitive and ships an integration test per feature. This is the canonical reference cited throughout this set  |
 
 Application code depends on `rmcp` (plus whichever transport feature it
 needs). `rmcp-macros` is pulled in transitively by the `macros` feature
@@ -36,12 +36,27 @@ needs). `rmcp-macros` is pulled in transitively by the `macros` feature
 
 ## Version and stability note
 
-This material targets **`rmcp` 1.x** (the workspace pins 1.7 at
-`Cargo.toml:49`). The SDK is officially Tier 2 conformance — most of the
-2025-11-25 MCP spec works, but pieces like prompt argument substitution,
-embedded resources in prompts, DNS-rebinding protection, and full
-SEP-1330 enum inference are still in motion. Specific known limitations:
+This material targets **`rmcp` 2.x** (the workspace pins 2.0 at
+`Cargo.toml:50`). Version 2.0.0 was a breaking release
+(`feat!: align model types with MCP 2025-11-25 spec`, upstream PR #927):
+most model types moved from public-field struct literals to
+`::new(...)` constructors plus `.with_*(...)` builder methods, and the
+`Content` / `Resource` / `ResourceTemplate` types are no longer
+`Annotated<Raw*>` wrappers — `annotations` and `_meta` are now inline
+fields on flat, `#[non_exhaustive]` structs. See
+`references/rust-sdk/server/tools.md` and
+`references/rust-sdk/server/resources.md` for the exact shapes. The SDK
+is officially Tier 2 conformance — most of the 2025-11-25 MCP spec
+works, but pieces like prompt argument substitution, embedded resources
+in prompts, DNS-rebinding protection, and full SEP-1330 enum inference
+are still in motion. Specific known limitations:
 
+- Sampling, Logging, and Roots are `#[deprecated]` as of 2.0.0 per
+  SEP-2577 (the types and methods still work — they emit a compiler
+  warning, not a hard error). `crates/mcp-server/src/tools.rs` still
+  demonstrates `ask_llm` (sampling) and `list_workspace_roots` (roots)
+  behind `#[allow(deprecated)]`, since both remain part of the protocol
+  today. Expect them to be removed in a future major version.
 - `OperationProcessor` does not yet expose per-task `created_at` /
   `last_updated_at` — `tasks/list` overrides have to fake the
   timestamps. See `references/rust-sdk/server/tasks.md`.
@@ -87,7 +102,7 @@ A common starter set for a server with stdio + HTTP + tasks +
 elicitation is what `crates/mcp-server/` uses:
 
 ```toml
-rmcp = { version = "1.7", features = [
+rmcp = { version = "2.0", features = [
     "server", "client", "macros",
     "transport-io",
     "transport-streamable-http-server",
@@ -109,7 +124,7 @@ impl ServerHandler`:
 use rmcp::{
     ErrorData as McpError, ServerHandler, ServiceExt,
     handler::server::router::tool::ToolRouter,
-    model::{CallToolResult, Content},
+    model::{CallToolResult, ContentBlock},
     tool, tool_handler, tool_router,
     transport::stdio,
 };
@@ -127,7 +142,7 @@ impl Hello {
 
     #[tool(description = "Health check.")]
     async fn ping(&self) -> Result<CallToolResult, McpError> {
-        Ok(CallToolResult::success(vec![Content::text("pong")]))
+        Ok(CallToolResult::success(vec![ContentBlock::text("pong")]))
     }
 }
 
@@ -237,7 +252,7 @@ for a one-line summary of every file. Quick map below:
 | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `references/rust-sdk/server/getting-started.md` | Composing `Server` with multiple routers; the stacked-handler-macros rule                                                               |
 | `references/rust-sdk/server/tools.md`           | Authoring `#[tool]` methods, `Parameters<T>`, `CallToolResult`, `task_support`, `annotations(...)` (declare or get default-destructive) |
-| `references/rust-sdk/server/prompts.md`         | `#[prompt_router]`, multi-arg prompt examples, `PromptMessageRole`                                                                      |
+| `references/rust-sdk/server/prompts.md`         | `#[prompt_router]`, multi-arg prompt examples, `Role`                                                                                   |
 | `references/rust-sdk/server/resources.md`       | Static resources, URI templates, why there's no macro router for resources                                                              |
 | `references/rust-sdk/server/tasks.md`           | SEP-1686 task lifecycle, `OperationProcessor`, the `list_tasks` override pattern                                                        |
 | `references/rust-sdk/server/sampling.md`        | `ctx.peer.create_message(...)`, multimodal content handling                                                                             |

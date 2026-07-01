@@ -19,7 +19,7 @@ The canonical local example is `crates/mcp-server/src/prompts.rs`.
 use rmcp::{
     ErrorData as McpError,
     handler::server::router::prompt::PromptRouter,
-    model::{GetPromptResult, PromptMessage, PromptMessageRole},
+    model::{GetPromptResult, PromptMessage, Role},
     prompt, prompt_router,
 };
 
@@ -28,8 +28,8 @@ impl Server {
     #[prompt(name = "greeting", description = "Say hello.")]
     async fn greeting(&self) -> Result<GetPromptResult, McpError> {
         let messages = vec![
-            PromptMessage::new_text(PromptMessageRole::User, "Please greet me."),
-            PromptMessage::new_text(PromptMessageRole::Assistant, "Hello! How can I help you today?"),
+            PromptMessage::new_text(Role::User, "Please greet me."),
+            PromptMessage::new_text(Role::Assistant, "Hello! How can I help you today?"),
         ];
         Ok(GetPromptResult::new(messages))
     }
@@ -83,7 +83,7 @@ impl Server {
         Parameters(args): Parameters<EchoArgs>,
     ) -> Result<GetPromptResult, McpError> {
         let messages = vec![PromptMessage::new_text(
-            PromptMessageRole::User,
+            Role::User,
             args.message,
         )];
         Ok(GetPromptResult::new(messages))
@@ -118,14 +118,15 @@ If you need to validate values *beyond* what the schema captures (e.g.
 
 ## Message roles
 
-`PromptMessageRole` has two variants: `User` and `Assistant`. A
-canned exchange typically alternates them so the model sees a complete
-turn. There's no `System` role at the prompt level — system prompts
-belong to sampling requests (`CreateMessageRequestParams::with_system_prompt`).
+`Role` (the same enum used by sampling messages) has two variants:
+`User` and `Assistant`. A canned exchange typically alternates them so
+the model sees a complete turn. There's no `System` role at the prompt
+level — system prompts belong to sampling requests
+(`CreateMessageRequestParams::with_system_prompt`).
 
 ```rust
-PromptMessage::new_text(PromptMessageRole::User, "Summarize the topic.")
-PromptMessage::new_text(PromptMessageRole::Assistant, "Here's a summary: ...")
+PromptMessage::new_text(Role::User, "Summarize the topic.")
+PromptMessage::new_text(Role::Assistant, "Here's a summary: ...")
 ```
 
 ## Result shape

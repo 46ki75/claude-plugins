@@ -5,6 +5,14 @@ asks the client what filesystem/workspace roots it has exposed (IDE
 project paths, sandbox directories, etc.). Servers use roots to scope
 file lookups, restrict search, or render context-aware UIs.
 
+> **Deprecated by SEP-2577.** As of rmcp 2.0, roots' types and methods
+> (`Root`, `ListRootsResult`, `Peer::list_roots`, etc.) carry
+> `#[deprecated]` — a compiler warning, not a hard error. They remain
+> fully functional and are still part of the protocol. Call sites that
+> keep using them (like `list_workspace_roots` below) wrap the call in
+> `#[allow(deprecated, reason = "...")]`; mirror that pattern in your
+> own code.
+
 ## When to read this
 
 - Writing a tool that needs to know where the user's project lives.
@@ -12,18 +20,19 @@ file lookups, restrict search, or render context-aware UIs.
   open folders.
 
 The canonical local example is `list_workspace_roots` in
-`crates/mcp-server/src/tools.rs:167-190`.
+`crates/mcp-server/src/tools.rs:179-209`.
 
 ## The minimum roots-using tool
 
 ```rust
 use rmcp::{
     ErrorData as McpError, RoleServer,
-    model::{CallToolResult, Content},
+    model::{CallToolResult, ContentBlock},
     service::RequestContext,
     tool,
 };
 
+#[allow(deprecated, reason = "SEP-2577 deprecates roots; kept as an example")]
 #[tool(description = "List the workspace roots the client has exposed.")]
 async fn list_workspace_roots(
     &self,
@@ -46,7 +55,7 @@ async fn list_workspace_roots(
             .collect::<Vec<_>>()
             .join("\n")
     };
-    Ok(CallToolResult::success(vec![Content::text(text)]))
+    Ok(CallToolResult::success(vec![ContentBlock::text(text)]))
 }
 ```
 
@@ -112,5 +121,5 @@ client's `ClientCapabilities::roots` field.
 - `references/rust-sdk/server/sampling.md`,
   `references/rust-sdk/server/elicitation.md` — sibling server-to-client requests
 - `references/rust-sdk/client/roots.md` — implementing the client side
-- `crates/mcp-server/src/tools.rs:167-190` — `list_workspace_roots`
+- `crates/mcp-server/src/tools.rs:179-209` — `list_workspace_roots`
   worked example

@@ -40,7 +40,7 @@ async fn list_resources_returns_the_static_example() -> anyhow::Result<()> {
         panic!("expected ListResourcesResult, got {response:?}");
     };
     assert_eq!(listed.resources.len(), 1);
-    assert_eq!(listed.resources[0].raw.uri, "mem://example");
+    assert_eq!(listed.resources[0].uri, "mem://example");
 
     client_service.cancel().await?;
     let _ = server_handle.await;

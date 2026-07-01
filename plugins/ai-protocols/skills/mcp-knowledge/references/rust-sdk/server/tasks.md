@@ -5,7 +5,7 @@ with `task` metadata, the server kicks off the work, returns a task
 handle immediately, and the client polls `tasks/list`, `tasks/get`,
 `tasks/result`, or `tasks/cancel` to drive the lifecycle.
 
-`rmcp` 1.x ships task support behind the `#[task_handler]` macro plus
+`rmcp` 2.x ships task support behind the `#[task_handler]` macro plus
 the `OperationProcessor` runtime in `rmcp::task_manager`.
 
 ## When to read this
@@ -85,7 +85,7 @@ async fn slow_count(
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
         tracing::debug!(tick = i, target = args.target, "slow_count tick");
     }
-    Ok(CallToolResult::success(vec![Content::text(
+    Ok(CallToolResult::success(vec![ContentBlock::text(
         args.target.to_string(),
     )]))
 }

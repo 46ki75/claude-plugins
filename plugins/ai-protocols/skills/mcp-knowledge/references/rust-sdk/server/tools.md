@@ -24,7 +24,7 @@ The canonical local example is `crates/mcp-server/src/tools.rs`.
 impl Server {
     #[tool(description = "Health-check tool. Returns 'pong'.")]
     async fn ping(&self) -> Result<CallToolResult, McpError> {
-        Ok(CallToolResult::success(vec![Content::text("pong")]))
+        Ok(CallToolResult::success(vec![ContentBlock::text("pong")]))
     }
 }
 ```
@@ -37,11 +37,11 @@ Tool methods take `&self` and return `Result<CallToolResult, McpError>`.
 The macros take care of marshaling them to JSON-RPC. `CallToolResult`
 shape:
 
-| Field                        | Constructor                                                          |
-| ---------------------------- | -------------------------------------------------------------------- |
-| Successful text reply        | `CallToolResult::success(vec![Content::text("...")])`                |
-| Successful image reply       | `CallToolResult::success(vec![Content::image(base64, "image/png")])` |
-| Error returned to the client | `CallToolResult::error(vec![Content::text("...")])`                  |
+| Field                        | Constructor                                                               |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| Successful text reply        | `CallToolResult::success(vec![ContentBlock::text("...")])`                |
+| Successful image reply       | `CallToolResult::success(vec![ContentBlock::image(base64, "image/png")])` |
+| Error returned to the client | `CallToolResult::error(vec![ContentBlock::text("...")])`                  |
 
 Returning `Err(McpError::...)` from the method bubbles up as a JSON-RPC
 error — usually you want `CallToolResult::error(...)` instead so the
@@ -73,7 +73,7 @@ impl Server {
         for _ in 1..=args.target {
             tokio::time::sleep(std::time::Duration::from_millis(100)).await;
         }
-        Ok(CallToolResult::success(vec![Content::text(args.target.to_string())]))
+        Ok(CallToolResult::success(vec![ContentBlock::text(args.target.to_string())]))
     }
 }
 ```
@@ -161,7 +161,7 @@ shows the round trip.
 
 ### `CallToolResult::error` vs `Err(McpError)`
 
-Use `CallToolResult::error(vec![Content::text("...")])` for problems
+Use `CallToolResult::error(vec![ContentBlock::text("...")])` for problems
 the tool itself surfaces (validation failures, downstream API errors).
 The client sees a successful JSON-RPC response with `is_error: true`,
 which is what most MCP UIs render as "the tool ran and reported a
@@ -182,7 +182,7 @@ the router to stay `pub(crate)`, pass `vis`:
 impl Server { /* ... */ }
 ```
 
-The local example uses this at `crates/mcp-server/src/tools.rs:47`.
+The local example uses this at `crates/mcp-server/src/tools.rs:53`.
 
 ### Renaming the router field
 

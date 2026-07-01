@@ -66,17 +66,16 @@ block stays compact.
 ## Listing static resources
 
 ```rust
-use rmcp::model::{ListResourcesResult, RawResource, Resource};
+use rmcp::model::{ListResourcesResult, Resource};
 
 const EXAMPLE_RESOURCE_URI: &str = "mem://example";
 const EXAMPLE_RESOURCE_NAME: &str = "example";
 
 pub fn list_resources(_server: &Server) -> ListResourcesResult {
-    let resource: Resource = RawResource::new(
+    let resource: Resource = Resource::new(
         EXAMPLE_RESOURCE_URI,
         EXAMPLE_RESOURCE_NAME.to_string(),
-    )
-    .no_annotation();
+    );
     ListResourcesResult {
         resources: vec![resource],
         next_cursor: None,
@@ -85,10 +84,11 @@ pub fn list_resources(_server: &Server) -> ListResourcesResult {
 }
 ```
 
-`Resource` is `Annotated<RawResource>`. The `.no_annotation()` builder
-produces a `Resource` with no annotations attached — equivalent to
-`Annotated { raw, annotations: None }`. Use `.with_annotation(...)` to
-attach hints like audience or priority.
+`Resource` is a flat, `#[non_exhaustive]` struct (no more `Annotated<RawResource>`
+wrapper). `Resource::new(uri, name)` builds it directly; chain
+`.with_title(...)`, `.with_description(...)`, `.with_mime_type(...)`,
+`.with_size(...)`, `.with_icons(...)`, or `.with_annotations(...)` to attach
+optional fields like audience or priority hints.
 
 ## Reading resources — dispatch by scheme
 
@@ -157,7 +157,7 @@ Two things to notice:
    like `echo://a/b`), while `greet://` enforces a fixed
    `{language}/{name}` shape. The skeleton makes this asymmetry
    deliberate; see the comment at
-   `crates/mcp-server/src/resources.rs:49-52`.
+   `crates/mcp-server/src/resources.rs:47-50`.
 
 ## Advertising templates
 
@@ -165,22 +165,18 @@ Two things to notice:
 client can fill in:
 
 ```rust
-use rmcp::model::{
-    ListResourceTemplatesResult, RawResourceTemplate, ResourceTemplate,
-};
+use rmcp::model::{ListResourceTemplatesResult, ResourceTemplate};
 
 const ECHO_RESOURCE_TEMPLATE: &str = "echo://{message}";
 const GREET_RESOURCE_TEMPLATE: &str = "greet://{language}/{name}";
 
 pub fn list_resource_templates(_server: &Server) -> ListResourceTemplatesResult {
-    let echo: ResourceTemplate = RawResourceTemplate::new(ECHO_RESOURCE_TEMPLATE, "echo")
+    let echo: ResourceTemplate = ResourceTemplate::new(ECHO_RESOURCE_TEMPLATE, "echo")
         .with_description("Reads back whatever appears after `echo://`.")
-        .with_mime_type("text/plain")
-        .no_annotation();
-    let greet: ResourceTemplate = RawResourceTemplate::new(GREET_RESOURCE_TEMPLATE, "greet")
+        .with_mime_type("text/plain");
+    let greet: ResourceTemplate = ResourceTemplate::new(GREET_RESOURCE_TEMPLATE, "greet")
         .with_description("Localized greeting. Supported languages: en, ja, es, fr.")
-        .with_mime_type("text/plain")
-        .no_annotation();
+        .with_mime_type("text/plain");
     ListResourceTemplatesResult {
         resource_templates: vec![echo, greet],
         next_cursor: None,

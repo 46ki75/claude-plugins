@@ -4,10 +4,16 @@
 //! Server` block so that the macro can generate one `Server::tool_router()`
 //! associated function.
 
+// `CreateMessageRequestParams` / `SamplingMessage` are SEP-2577-deprecated;
+// `ask_llm` below still demonstrates sampling, so importing them is expected.
+#[allow(
+    deprecated,
+    reason = "SEP-2577 deprecates sampling; kept as an example"
+)]
 use rmcp::{
     ErrorData as McpError, RoleServer,
     handler::server::wrapper::Parameters,
-    model::{CallToolResult, Content, CreateMessageRequestParams, SamplingMessage},
+    model::{CallToolResult, ContentBlock, CreateMessageRequestParams, SamplingMessage},
     schemars,
     service::{ElicitationError, RequestContext},
     tool, tool_router,
@@ -49,7 +55,7 @@ impl Server {
     /// Example tool. Replace with real tools.
     #[tool(description = "Health-check tool. Returns 'pong'.")]
     async fn ping(&self) -> Result<CallToolResult, McpError> {
-        Ok(CallToolResult::success(vec![Content::text("pong")]))
+        Ok(CallToolResult::success(vec![ContentBlock::text("pong")]))
     }
 
     /// Example task-capable tool. Sleeps `target * SLOW_COUNT_TICK_MS` and
@@ -68,7 +74,7 @@ impl Server {
             tokio::time::sleep(std::time::Duration::from_millis(SLOW_COUNT_TICK_MS)).await;
             tracing::debug!(tick = i, target = args.target, "slow_count tick");
         }
-        Ok(CallToolResult::success(vec![Content::text(
+        Ok(CallToolResult::success(vec![ContentBlock::text(
             args.target.to_string(),
         )]))
     }
@@ -78,6 +84,13 @@ impl Server {
     /// Requires a client that supports `sampling/createMessage` (e.g. Claude
     /// Desktop). Inspector will respond with an error if sampling isn't
     /// available.
+    ///
+    /// Sampling is deprecated by SEP-2577 as of rmcp 2.0 but remains part of
+    /// the protocol; this example keeps demonstrating it.
+    #[allow(
+        deprecated,
+        reason = "SEP-2577 deprecates sampling; kept as an example"
+    )]
     #[tool(description = "Ask the client's LLM a question via sampling.")]
     async fn ask_llm(
         &self,
@@ -111,7 +124,7 @@ impl Server {
                 "(no text response)".to_string()
             }
         };
-        Ok(CallToolResult::success(vec![Content::text(text)]))
+        Ok(CallToolResult::success(vec![ContentBlock::text(text)]))
     }
 
     /// Elicitation example: ask the user (via the client) for their name,
@@ -133,25 +146,25 @@ impl Server {
             .elicit::<UserNameInput>("Please enter your name")
             .await
         {
-            Ok(Some(input)) => Ok(CallToolResult::success(vec![Content::text(format!(
+            Ok(Some(input)) => Ok(CallToolResult::success(vec![ContentBlock::text(format!(
                 "Hello, {}!",
                 input.name
             ))])),
-            Ok(None) => Ok(CallToolResult::success(vec![Content::text(
+            Ok(None) => Ok(CallToolResult::success(vec![ContentBlock::text(
                 "Greeting skipped — no name was provided.",
             )])),
             Err(ElicitationError::UserDeclined) => {
-                Ok(CallToolResult::success(vec![Content::text(
+                Ok(CallToolResult::success(vec![ContentBlock::text(
                     "Greeting skipped — the user declined to share their name.",
                 )]))
             }
             Err(ElicitationError::UserCancelled) => {
-                Ok(CallToolResult::success(vec![Content::text(
+                Ok(CallToolResult::success(vec![ContentBlock::text(
                     "Greeting cancelled — the user dismissed the prompt.",
                 )]))
             }
             Err(ElicitationError::CapabilityNotSupported) => {
-                Ok(CallToolResult::success(vec![Content::text(
+                Ok(CallToolResult::success(vec![ContentBlock::text(
                     "This client does not support elicitation, so the user could not be \
                      prompted for a name.",
                 )]))
@@ -166,6 +179,10 @@ impl Server {
     /// Roots example: query the client for the filesystem/workspace roots
     /// it exposes, and return a summary. Requires a client that supports
     /// `roots/list` (e.g. an IDE-integrated MCP client).
+    ///
+    /// Roots is deprecated by SEP-2577 as of rmcp 2.0 but remains part of
+    /// the protocol; this example keeps demonstrating it.
+    #[allow(deprecated, reason = "SEP-2577 deprecates roots; kept as an example")]
     #[tool(description = "List the workspace roots the client has exposed.")]
     async fn list_workspace_roots(
         &self,
@@ -188,6 +205,6 @@ impl Server {
                 .collect::<Vec<_>>()
                 .join("\n")
         };
-        Ok(CallToolResult::success(vec![Content::text(text)]))
+        Ok(CallToolResult::success(vec![ContentBlock::text(text)]))
     }
 }

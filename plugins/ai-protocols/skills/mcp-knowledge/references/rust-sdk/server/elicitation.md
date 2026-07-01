@@ -17,7 +17,7 @@ the `ElicitationError` enum to be in scope.
 - You want to register a custom struct for elicitation.
 
 The canonical local example is `greet_user` in
-`crates/mcp-server/src/tools.rs:128-162`, with the regression test at
+`crates/mcp-server/src/tools.rs:130-177`, with the regression test at
 `crates/mcp-server/tests/elicitation.rs`.
 
 ## The minimum elicitation tool
@@ -25,7 +25,7 @@ The canonical local example is `greet_user` in
 ```rust
 use rmcp::{
     ErrorData as McpError, RoleServer,
-    model::{CallToolResult, Content},
+    model::{CallToolResult, ContentBlock},
     service::{ElicitationError, RequestContext},
     tool, schemars,
 };
@@ -49,21 +49,21 @@ async fn greet_user(
         .elicit::<UserNameInput>("Please enter your name")
         .await
     {
-        Ok(Some(input)) => Ok(CallToolResult::success(vec![Content::text(format!(
+        Ok(Some(input)) => Ok(CallToolResult::success(vec![ContentBlock::text(format!(
             "Hello, {}!",
             input.name
         ))])),
-        Ok(None) => Ok(CallToolResult::success(vec![Content::text(
+        Ok(None) => Ok(CallToolResult::success(vec![ContentBlock::text(
             "Greeting skipped — no name was provided.",
         )])),
         Err(ElicitationError::UserDeclined) => Ok(CallToolResult::success(vec![
-            Content::text("Greeting skipped — the user declined to share their name."),
+            ContentBlock::text("Greeting skipped — the user declined to share their name."),
         ])),
         Err(ElicitationError::UserCancelled) => Ok(CallToolResult::success(vec![
-            Content::text("Greeting cancelled — the user dismissed the prompt."),
+            ContentBlock::text("Greeting cancelled — the user dismissed the prompt."),
         ])),
         Err(ElicitationError::CapabilityNotSupported) => Ok(CallToolResult::success(vec![
-            Content::text(
+            ContentBlock::text(
                 "This client does not support elicitation, so the user could not be \
                  prompted for a name.",
             ),
@@ -104,7 +104,7 @@ not an object.
 
 `ctx.peer.elicit::<T>(prompt)` returns
 `Result<Option<T>, ElicitationError>`. The full variant list (from
-`submodules/mcp-rust-sdk/crates/rmcp/src/service/server.rs:455-486`):
+`submodules/mcp-rust-sdk/crates/rmcp/src/service/server.rs:495-530`):
 
 | Variant                           | Cause                                                                          | Surface as                                                        |
 | --------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
@@ -141,13 +141,15 @@ see `references/rust-sdk/client/elicitation.md`.
 The 2025-11-25 MCP spec adds URL-based elicitation: instead of
 collecting fields inline, the server tells the client to open a URL.
 `rmcp` represents this as the `UrlElicitationParams` variant of
-`CreateElicitationRequestParams` (see
-`submodules/mcp-rust-sdk/crates/rmcp/src/model.rs:2637-2669`).
+`ElicitRequestParams` (see
+`submodules/mcp-rust-sdk/crates/rmcp/src/model.rs:2743-2809`).
+`CreateElicitationRequestParams` is now a deprecated type alias for
+`ElicitRequestParams` — update any code still importing the old name.
 
 The typed `Peer::elicit<T>` helper covers the form path. For URL
-elicitation, construct the lower-level
-`CreateElicitationRequest` and send it via `ctx.peer.send_request(...)`
-directly. The upstream example
+elicitation, construct the lower-level `ElicitRequest`
+(`CreateElicitationRequest` is now a deprecated alias for it) and send
+it via `ctx.peer.send_request(...)` directly. The upstream example
 `submodules/mcp-rust-sdk/examples/servers/src/elicitation_stdio.rs`
 demonstrates both flavors.
 
@@ -195,7 +197,7 @@ user. Don't put secrets, tokens, or PII in field doc-comments.
 - `references/rust-sdk/server/roots.md` — the sibling server-to-client request
   for workspace listing
 - `references/rust-sdk/client/elicitation.md` — implementing the client side
-- `crates/mcp-server/src/tools.rs:128-162` — `greet_user` worked example
+- `crates/mcp-server/src/tools.rs:130-177` — `greet_user` worked example
 - `crates/mcp-server/tests/elicitation.rs` — regression test locking
   in the "decline is graceful" contract
 - `submodules/mcp-rust-sdk/examples/servers/src/elicitation_stdio.rs`

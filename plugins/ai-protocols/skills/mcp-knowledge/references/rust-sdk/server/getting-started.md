@@ -20,7 +20,7 @@ end-to-end before this file if you prefer code-first orientation.
 use rmcp::{
     ErrorData as McpError, ServerHandler, ServiceExt,
     handler::server::router::tool::ToolRouter,
-    model::{CallToolResult, Content},
+    model::{CallToolResult, ContentBlock},
     tool, tool_handler, tool_router,
     transport::stdio,
 };
@@ -38,7 +38,7 @@ impl Hello {
 
     #[tool(description = "Health check.")]
     async fn ping(&self) -> Result<CallToolResult, McpError> {
-        Ok(CallToolResult::success(vec![Content::text("pong")]))
+        Ok(CallToolResult::success(vec![ContentBlock::text("pong")]))
     }
 }
 
@@ -67,7 +67,7 @@ auto-implements `ServerHandler::list_tools` and `call_tool`.
 
 When you go beyond tools — prompts, resources, tasks — the structure
 grows but the rules stay the same. The full shape from
-`crates/mcp-server/src/lib.rs:33-60`:
+`crates/mcp-server/src/lib.rs:34-61`:
 
 ```rust
 use std::sync::Arc;
@@ -131,7 +131,7 @@ type, which Rust forbids.
 If you need to manually override one of the methods a macro synthesizes
 (e.g. `list_tasks` to merge in completed tasks), add the override to
 the same `impl` block. The macro skips methods you've defined yourself.
-See `crates/mcp-server/src/lib.rs:119-128` for the `list_tasks`
+See `crates/mcp-server/src/lib.rs:120-129` for the `list_tasks`
 override.
 
 ## Resources are different
@@ -159,7 +159,7 @@ See `references/rust-sdk/server/resources.md` for the full pattern.
 `RunningService<RoleServer, Server>` and starts the message loop.
 `.waiting()` blocks until the transport closes or the service is
 cancelled. For the streamable HTTP transport, the equivalent is the
-axum integration shown in `crates/mcp-server/src/bin/http.rs:31-47` —
+axum integration shown in `crates/mcp-server/src/bin/http.rs:32-47` —
 see `references/rust-sdk/server/transports.md`.
 
 ## Capability advertisement and instructions

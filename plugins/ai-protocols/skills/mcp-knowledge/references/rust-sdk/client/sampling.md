@@ -1,5 +1,14 @@
 # Client: sampling (`create_message`)
 
+> **SEP-2577 deprecation.** As of rmcp 2.0, sampling types and methods
+> (`CreateMessageRequestParams`, `CreateMessageResult`, `SamplingMessage`,
+> `Peer::create_message`, ...) are marked `#[deprecated]`. They still work —
+> it's a compiler warning, not a hard error — and sampling remains part of
+> the protocol. Real code that keeps using them (like the examples on this
+> page) should wrap the call site in
+> `#[allow(deprecated, reason = "SEP-2577 deprecates sampling; kept as an example")]`,
+> matching the pattern in `crates/mcp-server/src/tools.rs::ask_llm`.
+
 When a server calls `sampling/createMessage`, the client is expected to
 hand the request to an LLM and return the model's response.
 `rmcp` exposes the hook as `ClientHandler::create_message`.
@@ -29,6 +38,7 @@ use rmcp::{
 #[derive(Default, Clone)]
 struct SamplingClient;
 
+#[allow(deprecated, reason = "SEP-2577 deprecates sampling; kept as an example")]
 impl ClientHandler for SamplingClient {
     fn get_info(&self) -> ClientInfo {
         ClientInfo::new(
@@ -79,7 +89,7 @@ Useful fields on the params (full list in
 | `temperature`       | `Option<f32>`                                                 |
 | `max_tokens`        | `u32` — required, server-supplied                             |
 | `stop_sequences`    | `Option<Vec<String>>`                                         |
-| `metadata`          | `Option<JsonObject>`                                          |
+| `metadata`          | `Option<Value>`                                               |
 
 `include_context` is the server's way of saying "also feed in context
 from MCP servers when sampling." Most clients ignore it — handling it
@@ -100,11 +110,12 @@ CreateMessageResult::new(
 
 Known stop-reason constants:
 
-| Constant                                         | Meaning                          |
-| ------------------------------------------------ | -------------------------------- |
-| `CreateMessageResult::STOP_REASON_END_TURN`      | Model finished naturally         |
-| `CreateMessageResult::STOP_REASON_STOP_SEQUENCE` | Hit one of `stop_sequences`      |
-| `CreateMessageResult::STOP_REASON_MAX_TOKENS`    | Output truncated at `max_tokens` |
+| Constant                                         | Meaning                               |
+| ------------------------------------------------ | ------------------------------------- |
+| `CreateMessageResult::STOP_REASON_END_TURN`      | Model finished naturally              |
+| `CreateMessageResult::STOP_REASON_END_SEQUENCE`  | Hit one of `stop_sequences`           |
+| `CreateMessageResult::STOP_REASON_END_MAX_TOKEN` | Output truncated at `max_tokens`      |
+| `CreateMessageResult::STOP_REASON_TOOL_USE`      | Model produced a tool call (SEP-1577) |
 
 Use the string literal if the constant you want isn't exposed yet.
 
@@ -112,17 +123,21 @@ Use the string literal if the constant you want isn't exposed yet.
 
 `SamplingMessage::user_text` / `assistant_text` produce text turns. For
 images or audio, construct the message manually with the appropriate
-`Content` variant:
+`SamplingMessageContentBlock` variant — the sampling-specific content
+union (text | image | audio | tool_use | tool_result), distinct from the
+general-purpose `ContentBlock` used everywhere else (tool results,
+resources, prompts):
 
 ```rust
-use rmcp::model::{Content, RawContent, RawImageContent, SamplingMessage, Role};
+use rmcp::model::{ImageContent, Role, SamplingMessage, SamplingMessageContentBlock};
 
-let img = Content::image(base64_bytes, "image/png".to_string());
-let message = SamplingMessage {
-    role: Role::Assistant,
-    content: img.into(), // SamplingContent::Single(img)
-};
+let img = SamplingMessageContentBlock::Image(ImageContent::new(base64_bytes, "image/png"));
+let message = SamplingMessage::new(Role::Assistant, img);
 ```
+
+`SamplingMessage` is `#[non_exhaustive]`, so build it with
+`SamplingMessage::new(role, content)` / `::new_multiple(role, contents)`
+rather than a struct literal.
 
 The server side (see `references/rust-sdk/server/sampling.md`) iterates content
 blocks via `as_text()` etc., so non-text content needs explicit

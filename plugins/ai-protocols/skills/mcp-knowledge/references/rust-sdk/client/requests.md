@@ -99,12 +99,21 @@ to `ClientRequest::*` is done by the enum variants you choose.
 | `SetLevelRequest`              | `SetLevelRequestParams`          | `.set_level(...)`                              |
 | `SubscribeRequest`             | `SubscribeRequestParams`         | `.subscribe(...)`                              |
 | `UnsubscribeRequest`           | `UnsubscribeRequestParams`       | `.unsubscribe(...)`                            |
-| `EnqueueTaskRequest`           | `CreateTaskRequestParams`        | (use `.call_tool(...)` with `.with_task(...)`) |
 | `ListTasksRequest`             | `Option<PaginatedRequestParams>` | (raw `send_request`)                           |
-| `GetTaskRequest`               | `GetTaskRequestParams`           | (raw `send_request`)                           |
-| `GetTaskResultRequest`         | `GetTaskResultRequestParams`     | (raw `send_request`)                           |
+| `GetTaskRequest`               | `GetTaskParams`                  | (raw `send_request`)                           |
+| `GetTaskPayloadRequest`        | `GetTaskPayloadParams`           | (raw `send_request`)                           |
 | `CancelTaskRequest`            | `CancelTaskParams`               | (raw `send_request`)                           |
 | `CustomRequest`                | arbitrary JSON                   | (raw `send_request`)                           |
+
+There's no separate "enqueue task" request variant — invoking a tool as a
+task is `CallToolRequest` (or `.call_tool(...)`) with
+`CallToolRequestParams::with_task(TaskMetadata::new())` set. The server
+replies with `ServerResult::CreateTaskResult` instead of
+`ServerResult::CallToolResult`.
+
+`GetTaskPayloadRequest` / `GetTaskPayloadParams` were named
+`GetTaskResultRequest` / `GetTaskResultParams` before rmcp 2.0; the old
+names are kept as deprecated aliases.
 
 Exact variant names live in `model.rs` — `grep -n "pub enum ClientRequest"
 submodules/mcp-rust-sdk/crates/rmcp/src/model.rs` if you need the
@@ -149,7 +158,7 @@ The fix: accept either:
 ```rust
 let response = client
     .send_request(ClientRequest::CancelTaskRequest(Request::new(
-        CancelTaskParams { task_id: task_id.clone() },
+        CancelTaskParams::new(task_id.clone()),
     )))
     .await?;
 
@@ -160,6 +169,10 @@ let task = match response {
 };
 assert_eq!(task.status, TaskStatus::Cancelled);
 ```
+
+`CancelTaskParams` is `#[non_exhaustive]`, so build it with
+`CancelTaskParams::new(task_id)` rather than a struct literal — the
+latter no longer compiles from outside the `rmcp` crate.
 
 `crates/mcp-server/tests/task.rs::list_tasks_reports_cancelled_status_for_cancelled_task`
 shows this in practice. If you see a test failing on
@@ -184,14 +197,18 @@ let response = tokio::time::timeout(
 Send a fire-and-forget notification via `send_notification`:
 
 ```rust
-use rmcp::model::{ClientNotification, ProgressNotificationParam};
+use rmcp::model::{ClientNotification, Notification, ProgressNotificationParam};
 
 client
     .send_notification(ClientNotification::ProgressNotification(
-        Notification::new(ProgressNotificationParam { /* ... */ })
+        Notification::new(ProgressNotificationParam::new(progress_token, 0.5)),
     ))
     .await?;
 ```
+
+`ProgressNotificationParam` is `#[non_exhaustive]` — build it with
+`::new(progress_token, progress)` plus `.with_total(...)` /
+`.with_message(...)`, not a struct literal.
 
 There's no response and no `await` for the server's reply.
 

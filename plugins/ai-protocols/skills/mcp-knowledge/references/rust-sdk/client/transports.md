@@ -46,12 +46,17 @@ let client = ().serve(transport).await?;
 ### When the binary path isn't known statically
 
 Use `which_command` (gated behind the `which-command` feature) to
-resolve a binary name to a path cross-platform:
+resolve a binary name to a path cross-platform. It returns a
+`tokio::process::Command` pointing at the resolved executable, which you
+then configure and hand to `TokioChildProcess::new`:
 
 ```rust
-use rmcp::transport::which_command::WhichCommand;
+use rmcp::transport::{which_command, ConfigureCommandExt, TokioChildProcess};
 
-let transport = TokioChildProcess::new(WhichCommand::new("python").arg("-m").arg("my_mcp_server"))?;
+let cmd = which_command("python")?.configure(|cmd| {
+    cmd.arg("-m").arg("my_mcp_server");
+});
+let transport = TokioChildProcess::new(cmd)?;
 ```
 
 ## Streamable HTTP (`transport-streamable-http-client-reqwest`)

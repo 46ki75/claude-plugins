@@ -7,7 +7,7 @@
 use rmcp::{
     ErrorData as McpError,
     handler::server::wrapper::Parameters,
-    model::{GetPromptResult, PromptMessage, PromptMessageRole},
+    model::{GetPromptResult, PromptMessage, Role},
     prompt, prompt_router, schemars,
 };
 use serde::{Deserialize, Serialize};
@@ -48,12 +48,9 @@ impl Server {
     )]
     async fn greeting(&self) -> Result<GetPromptResult, McpError> {
         let messages = vec![
+            PromptMessage::new_text(Role::User, "Hello! I'd like to start our conversation."),
             PromptMessage::new_text(
-                PromptMessageRole::User,
-                "Hello! I'd like to start our conversation.",
-            ),
-            PromptMessage::new_text(
-                PromptMessageRole::Assistant,
+                Role::Assistant,
                 "Hello! I'm here to help. What would you like to discuss today?",
             ),
         ];
@@ -69,10 +66,7 @@ impl Server {
         &self,
         Parameters(args): Parameters<EchoPromptArgs>,
     ) -> Result<GetPromptResult, McpError> {
-        let messages = vec![PromptMessage::new_text(
-            PromptMessageRole::User,
-            args.message.clone(),
-        )];
+        let messages = vec![PromptMessage::new_text(Role::User, args.message.clone())];
         Ok(GetPromptResult::new(messages).with_description(format!("Echo of: {}", args.message)))
     }
 
@@ -103,8 +97,8 @@ impl Server {
         let user = format!("Summarize the following topic: {}", args.topic);
 
         let messages = vec![
-            PromptMessage::new_text(PromptMessageRole::Assistant, system),
-            PromptMessage::new_text(PromptMessageRole::User, user),
+            PromptMessage::new_text(Role::Assistant, system),
+            PromptMessage::new_text(Role::User, user),
         ];
         Ok(GetPromptResult::new(messages).with_description(format!(
             "{count}-bullet {tone} summary of '{topic}'",
