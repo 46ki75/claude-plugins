@@ -1,26 +1,25 @@
 ---
 name: development-standards
 description: >
-  Org-internal engineering standards for this organization's projects.
-  Invoke whenever scaffolding a new repo, auditing an existing one,
-  setting up CI, or configuring tooling files like `Cargo.toml`,
+  Org-internal engineering standards. Invoke when scaffolding a repo,
+  auditing one, setting up CI, or configuring `Cargo.toml`,
   `rust-toolchain.toml`, `justfile`, `.editorconfig`,
   `.markdownlint-cli2.yaml`, `tsconfig.json`, `package.json`,
   `pnpm-lock.yaml`, `bunfig.toml`, `pyproject.toml`, `uv.lock`,
-  `.python-version`, or `*.tf`. Also invoke for work involving `axum`,
-  `utoipa`, `markdownlint-cli2`, `uv`, `ruff`, `pyright`, `pytest`, or
-  Node package-manager setup (pnpm is the org default).
-  Rust and Python are fully documented: Cargo workspace inheritance,
-  MSRV pinning, `just` as task runner, `cargo-llvm-cov` coverage,
-  hermetic-vs-live test split, Axum + utoipa OpenAPI; uv workspaces,
-  packaged `src` layout, ruff, pyright strict, pytest live-marker
-  tiers. TypeScript, Node.js, Bun, Terraform, Rust libraries, and Rust
-  GraphQL are stubs — invoke anyway so the user can define the
-  convention rather than receive an improvised one.
+  `.python-version`, `lefthook.yml`, or `*.tf`. Also for `axum`,
+  `utoipa`, `async-graphql`, `markdownlint-cli2`, `uv`, `ruff`,
+  `pyright`, `pytest`, `eslint`, `prettier`, or Node package-manager
+  setup (pnpm is the org default). Fully documented: Rust (workspace
+  inheritance, MSRV, `just`, coverage, test tiers, Axum+utoipa,
+  published-crate conventions, async-graphql), Python (uv workspaces,
+  `src` layout, ruff, pyright strict, pytest tiers), TypeScript/Node
+  (tsconfig, project references, npm scripts), Terraform (workspaces,
+  backend, naming). Only Bun is a stub — invoke anyway so the user
+  defines the convention rather than getting an improvised one.
 license: MIT
 metadata:
   author: "Ikuma Yamashita"
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Development Standards
@@ -41,12 +40,12 @@ skill — defer there, not here.
 
 ### Rust — `references/rust/`
 
-| File             | When to read                                                                                                                          |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `general.md`     | Any Rust project: workspace inheritance, `rust-toolchain.toml`, `just` recipes, `cargo-llvm-cov`, integration test tiers.             |
-| `web-openapi.md` | HTTP API with `axum` + `utoipa`: `OpenApiRouter`, Controller/UseCase/Repository layering, `ToSchema` DTOs, error mapping, Swagger UI. |
-| `web-graphql.md` | _Stub — not yet documented._                                                                                                          |
-| `library.md`     | _Stub — not yet documented._                                                                                                          |
+| File             | When to read                                                                                                                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `general.md`     | Any Rust project: workspace inheritance, `rust-toolchain.toml`, `just` recipes, `cargo-llvm-cov`, integration test tiers.                                                                             |
+| `web-openapi.md` | HTTP API with `axum` + `utoipa`: `OpenApiRouter`, Controller/UseCase/Repository layering, `ToSchema` DTOs, error mapping, Swagger UI.                                                                 |
+| `web-graphql.md` | HTTP API with `async-graphql`: schema composition, Repository/Service/Resolver layering, `ComplexObject` lazy fields. Superseded by `web-openapi.md` for new work — read the status note at the top.  |
+| `library.md`     | Publishable crates: multi-crate SDK layout, proc-macro crate splits, versioning/release conventions, `readonly`/`mutable` test tiers, gaps to close (docs.rs metadata, sealed traits, semver checks). |
 
 ### Python — `references/python/`
 
@@ -54,14 +53,29 @@ skill — defer there, not here.
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `general.md` | Any Python project: uv workspaces, `.python-version` pinning, packaged `src` layout, ruff, pyright strict, stdlib `logging`, pytest hermetic/live tiers, `just` recipes. |
 
+### TypeScript — `references/typescript/`
+
+| File         | When to read                                                                                                                                          |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `general.md` | Any TypeScript project: `tsconfig.json` baseline, project references for multi-context packages, inline type-only imports, ESLint/Prettier/Stylelint. |
+
+### Node.js — `references/nodejs/`
+
+| File         | When to read                                                                                                                  |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `general.md` | Any Node project: dot-namespaced `package.json` scripts, `engines` policy, OpenAPI-to-TypeScript client generation, CI shape. |
+
+### Terraform — `references/terraform/`
+
+| File         | When to read                                                                                                                                       |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `general.md` | Any Terraform config: flat file-per-resource layout, S3/Terraform-Cloud backend choice, workspace-based environments, naming, GitHub-as-Terraform. |
+
 ### Planned but unwritten
 
-| Section                  | Status                       |
-| ------------------------ | ---------------------------- |
-| `references/typescript/` | _Stub — not yet documented._ |
-| `references/nodejs/`     | _Stub — not yet documented._ |
-| `references/bun/`        | _Stub — not yet documented._ |
-| `references/terraform/`  | _Stub — not yet documented._ |
+| Section           | Status                       |
+| ----------------- | ---------------------------- |
+| `references/bun/` | _Stub — not yet documented._ |
 
 ## Handling stubbed sections
 

@@ -82,6 +82,11 @@ resolve to the version the floor promises — the same pairing as `rust-version`
 When both agree, `uv run pytest` in CI is a real floor test, not just a
 declaration. Bump them together, in one commit.
 
+Pin `.python-version` at the **repo root** so it covers the whole workspace.
+A version file scoped to a single member package only pins that package —
+it silently stops being a floor test for everything else the moment a
+second package is added.
+
 ## Package layout
 
 Default to the packaged `src` layout — an importable package directory under
@@ -225,6 +230,12 @@ Name live test files and functions with a `live` prefix or suffix so triage is
 grep-able. Live-test failures MUST NOT block PR merges — they fail for reasons
 unrelated to the diff.
 
+This marker-based split is the standard even though no audited org codebase
+has a live-tier Python test yet — every observed Python package mocks its
+external dependencies (SSM, the Claude Agent SDK) instead of hitting them.
+Adopt the marker the first time a genuinely live test is written; don't wait
+for a second example to justify it.
+
 ## Task runner
 
 Use [`just`](https://github.com/casey/just), same as every other language in the
@@ -296,6 +307,13 @@ jobs:
 `just test-live` runs on manual dispatch or schedule, behind a GitHub Actions
 environment with required reviewers and environment-scoped secrets — the same
 gating as `ci-live` on the Rust side.
+
+Treat this workflow as the target, not an assumed baseline: at least one
+audited org repo runs `ruff`/`pyright`/`pytest` only through local
+`lefthook` hooks and has no GitHub Actions workflow touching Python at all,
+which means a `--no-verify` commit ships with zero automated checks. If
+you're standing up CI for a Python repo, don't skip this step because a
+sibling repo did.
 
 ## `.gitignore` baseline
 

@@ -204,6 +204,8 @@ Pulls in the `async-trait` crate. Reasonable when a trait has many methods and t
 
 Don't mix the two within one trait — pick one and apply it to every method, so impl blocks and call sites stay grep-able.
 
+In practice, across audited org repos, `#[async_trait]` is the more common choice on Repository/UseCase traits — boxed futures are a minority pattern used by only one crate. Treat the table above as the standard for *new* code, but don't be surprised to find `#[async_trait]` as the norm in an existing codebase; that's not drift to fix opportunistically.
+
 ### Native `async fn` in traits
 
 Native `async fn` in traits (stable since Rust 1.75) is **dyn-incompatible** by default — `Arc<dyn FooRepository>` won't compile if the trait uses bare `async fn`. The `#[trait_variant::make]` macro and the `return_type_notation` feature partially close this gap, but neither is stable as of Rust 1.90.[[1]](https://blog.rust-lang.org/inside-rust/2024/05/01/dyn-async-traits-call-for-proposals/) Until native dyn-compatible async fn lands on stable, the boxed-future form above is the most forward-compatible choice.
@@ -256,6 +258,14 @@ CI wiring:
 
 Name any file or test that hits an external system with a `live_` prefix so triage is grep-able. See _Rust Project Primer_'s External Services chapter for the broader pattern.[[3]](https://rustprojectprimer.com/testing/external-services.html)
 
+### Variant: tests co-located in one file
+
+The file-per-tier split above is the target shape, but the more commonly observed pattern in existing crates is a single test file with hermetic and `#[ignore = "live: ..."]` tests interleaved, relying on the `live_` name prefix alone for triage rather than a physical file split. That's an acceptable variant for a crate that only has a handful of live tests — split into `tests/live.rs` once a crate's live tests outgrow a quick `grep live_`.
+
+### Variant: gating by capability, not just "hits the network"
+
+For a crate whose "live" tests can also **mutate** a real third-party system (not just read from one), consider splitting the axis into `readonly` vs. `mutable` instead of (or in addition to) hermetic vs. live — two separate test binaries (e.g. `tests/integration_test_readonly.rs` / `tests/integration_test_mutable.rs`), gated by which credential env var is set rather than `#[ignore]`. State explicitly in the crate's contributor docs that mutable tests must not be run by an AI agent unsupervised. This is a sharper cut than hermetic/live when "live" also means "destructive."
+
 ## Enforcement
 
-Cargo has no built-in lint for "member specifies a version directly." Run `cargo-workspace-inheritance-check` in CI to catch drift and promotion candidates.[[4]](https://github.com/marketplace/actions/cargo-workspace-inheritance-check)
+Cargo has no built-in lint for "member specifies a version directly." `cargo-workspace-inheritance-check` (a GitHub Action) can catch drift and promotion candidates in CI.[[4]](https://github.com/marketplace/actions/cargo-workspace-inheritance-check) Treat this as a recommendation, not an assumed baseline — audited org repos declare workspace-dependency inheritance as a rule but do not actually run this check, and at least one real re-pinning violation has gone uncaught as a result. If you're setting up a new repo, wire it in from the start rather than relying on manual review to catch drift.
