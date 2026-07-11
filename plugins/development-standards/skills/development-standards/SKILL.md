@@ -31,9 +31,9 @@ reference that matches the task, not the whole tree.
 
 ### Cross-cutting — `references/general/`
 
-| File                | When to read                                                                                                                                    |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `git-repository.md` | New repo setup, configuring `.editorconfig`, `markdownlint-cli2`, pnpm as the default package manager, baseline layout, editor recommendations. |
+| File                | When to read                                                                                                                                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `git-repository.md` | New repo setup, configuring `.editorconfig`, `markdownlint-cli2`, pnpm as the default package manager, lefthook git hooks (file-list template convention, Claude Code `PostToolUse` integration), baseline layout, editor recommendations. |
 
 Commit-message conventions live in the separate `conventional-commits`
 skill — defer there, not here.
