@@ -23,6 +23,9 @@ and publishes every skill as an agentskills.io ZIP release.
 | `cargo clippy --workspace --all-targets` | Lint (CI gate). |
 | `git submodule update --init --recursive` | Init submodules (run at repo root). |
 
+Use pnpm only — never run `npm install` or commit `package-lock.json`
+(`pnpm-lock.yaml` is the single lockfile).
+
 ## Architecture
 
 Two parallel concerns share the repo:
